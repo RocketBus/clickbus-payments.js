@@ -2,7 +2,7 @@
   "name": "clickbus-payments.js",
   "version": "0.1.0",
   "description": "A JavaScript lib for clients implements Clickbus` payment step",
-  "main": "src/clickbus-payments.js",
+  "main": "src/main.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/RocketBus/clickbus-payments.js"
@@ -23,5 +23,12 @@
   "bugs": {
     "url": "https://github.com/RocketBus/clickbus-payments.js/issues"
   },
-  "homepage": "http://docs.clickbus.com.br/"
+  "homepage": "http://docs.clickbus.com.br/",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-qunit": "^1.2.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglifyjs": "^0.6.2"
+  }
 }
