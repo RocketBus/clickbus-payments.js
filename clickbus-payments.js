@@ -30,7 +30,7 @@ var config = {
  * @param {Object} options
  * @api public
  */
-function ClickBusPayments() {
+function ClickBusPayments(options) {
     this.options = {
         creditcardFieldId: "credit_card",
         securityCodeFieldId: "security_code",
@@ -60,14 +60,12 @@ function ClickBusPayments() {
     }
 
     this.updateForm();
-
-    loadScript(config.javascript_url, this.start);
+    loadScript(config.javascript_url, function() { return this.start()}.bind(this));
 };
 
 ClickBusPayments.prototype.start = function() {
-    console.log('Script ready');
-    this.loaded = true;
     Mercadopago.setPublishableKey(config.public_key);
+    this.loaded = true;
 };
 
 ClickBusPayments.prototype.updateForm = function() {

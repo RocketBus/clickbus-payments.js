@@ -29,8 +29,7 @@ QUnit.test('Clickbus javascript injection', function(assert) {
     var clickbus = new ClickBusPayments();
 
     setTimeout(function() {
-        console.log(clickbus.loaded);
         assert.ok(clickbus.loaded);
         done();
-    }, 1000);
+    }, 1500);
 });
