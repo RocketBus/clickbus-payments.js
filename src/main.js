@@ -20,21 +20,51 @@
  * @param {Object} options
  * @api public
  */
-function ClickBusPayments(options) {
-    this.done = false;
+function ClickBusPayments() {
+    console.log('instance');
+    this.options = {
+        creditcardFieldId: "credit_card",
+        securityCodeFieldId: "security_code",
+        expirationMonthFieldId: "expiration_month",
+        expirationYearFieldId: "expiration_year",
+        holderNameFieldId: "holder_name",
+        docTypeFieldId: "doc_type",
+        docNumberFieldId: "doc_number"
+    };
 
-    if (!options.creditcardFieldId) throw new Error('creditcardFieldId is required');
-    if (!options.securityCodeFieldId) throw new Error('securityCodeFieldId is required');
-    if (!options.expirationMonthFieldId) throw new Error('expirationMonthFieldId is required');
-    if (!options.expirationYearFieldId) throw new Error('expirationYearFieldId is required');
-    if (!options.holderNameFieldId) throw new Error('holderNameFieldId is required');
-    if (!options.docTypeFieldId) throw new Error('docTypeFieldId is required');
-    if (!options.docNumberFieldId) throw new Error('docNumberFieldId is required');
+    this.attributeNames = {
+        creditcardFieldId: "cardNumber",
+        securityCodeFieldId: "securityCode",
+        expirationMonthFieldId: "cardExpirationMonth",
+        expirationYearFieldId: "cardExpirationYear",
+        holderNameFieldId: "cardholderName",
+        docTypeFieldId: "docType",
+        docNumberFieldId: "docNumber"
+    };
 
-    loadScript(config.javascript_url, function() { return this.start }.bind(this));
+    this.loaded = false;
+
+    if (arguments[0] && arguments[0] instanceof Object) {
+        for (var argument in arguments[0]) {
+            this.options[argument] = arguments[0][argument];
+        }
+    }
+
+    this.updateForm();
+
+    loadScript(config.javascript_url, this.start);
 };
 
 ClickBusPayments.prototype.start = function() {
     console.log('Script ready');
-    this.done = true;
+    this.loaded = true;
+    Mercadopago.setPublishableKey(config.public_key);
 };
+
+ClickBusPayments.prototype.updateForm = function() {
+    for (var fieldId in this.options) {
+        var element = document.getElementById(this.options[fieldId]);
+        if (!element) throw new Error(this.options[fieldId] + ' is required');
+        element.setAttribute('data-checkout', this.attributeNames[fieldId]);
+    }
+}

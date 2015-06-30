@@ -25,4 +25,8 @@ gulp.task('qunit', function() {
         .pipe(qunit());
 });
 
+gulp.task('watch', function() {
+    gulp.watch(pathJs, ['uglify', 'concat']);
+});
+
 gulp.task('default', ['uglify', 'concat', 'qunit']);
