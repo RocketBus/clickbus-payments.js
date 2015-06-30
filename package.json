@@ -1,0 +1,27 @@
+{
+  "name": "clickbus-payments.js",
+  "version": "0.1.0",
+  "description": "A JavaScript lib for clients implements Clickbus` payment step",
+  "main": "src/clickbus-payments.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RocketBus/clickbus-payments.js"
+  },
+  "keywords": [
+    "javascript",
+    "library",
+    "clickbus",
+    "payment"
+  ],
+  "author": "Clickbus Team",
+  "contributors": [
+    {
+      "name": "Tiago Butzke",
+      "email": "tiago.butzke@gmail.com"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/RocketBus/clickbus-payments.js/issues"
+  },
+  "homepage": "http://docs.clickbus.com.br/"
+}
