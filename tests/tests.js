@@ -16,13 +16,13 @@ QUnit.test('Clickbus instance validations', function(assert) {
 QUnit.test('Clickbus javascript injection', function(assert) {
     var done = assert.async();
     var clickbus = new ClickBusPayments({
-        creditcardFieldId: "4111-1111-1111-1111",
-        securityCodeFieldId: "737",
-        expirationMonthFieldId: "06",
-        expirationYearFieldId: "2016",
-        holderNameFieldId: "Johnny Cash",
-        docTypeFieldId: "CPF",
-        docNumberFieldId: "689.466.989-93"
+        creditcardFieldId: "credit_card",
+        securityCodeFieldId: "security_code",
+        expirationMonthFieldId: "expiration_month",
+        expirationYearFieldId: "expiration_year",
+        holderNameFieldId: "holder_name",
+        docTypeFieldId: "doc_type",
+        docNumberFieldId: "doc_number"
     });
 
     setTimeout(function() {
