@@ -7,21 +7,25 @@
 /**
  * Initialize a `ClickbusPayments` with the given `options`.
  *
- * Required:
+ * Not Required:
  *
- *  - `creditcardFieldId`       HTML field name for creditcard number
- *  - `securityCodeFieldId`     HTML field name for creditcard security code number
- *  - `expirationMonthFieldId`  HTML field name for creditcard expiration month
- *  - `expirationYearFieldId`   HTML field name for creditcard expiration year
- *  - `holderNameFieldId`       HTML field name for creditcard holder name
- *  - `docTypeFieldId`          HTML field name for creditcard holder document type
- *  - `docNumberFieldId`        HTML field name for creditcard holder document number
+ *  - `paymentFormId`           HTML form id
+ *  - `tokenFieldId`            HTML hidden field id where we'll put the generated token
+ *  - `creditcardFieldId`       HTML field id for creditcard number, default credit_card
+ *  - `securityCodeFieldId`     HTML field id for creditcard security code number, default security_code
+ *  - `expirationMonthFieldId`  HTML field id for creditcard expiration month, default expiration_month
+ *  - `expirationYearFieldId`   HTML field id for creditcard expiration year, default expiration_year
+ *  - `holderNameFieldId`       HTML field id for creditcard holder name, default holder_name
+ *  - `docTypeFieldId`          HTML field id for creditcard holder document type, default doc_type
+ *  - `docNumberFieldId`        HTML field id for creditcard holder document number, default doc_number
  *
  * @param {Object} options
  * @api public
  */
 function ClickBusPayments(options) {
     this.options = {
+        paymentFormId: "payment_form",
+        tokenFieldId: "token",
         creditcardFieldId: "credit_card",
         securityCodeFieldId: "security_code",
         expirationMonthFieldId: "expiration_month",
@@ -43,25 +47,48 @@ function ClickBusPayments(options) {
 
     this.loaded = false;
 
-    if (arguments[0] && arguments[0] instanceof Object) {
-        for (var argument in arguments[0]) {
-            this.options[argument] = arguments[0][argument];
-        }
-    }
-
     this.updateForm();
     loadScript(config.javascript_url, function() { return this.start()}.bind(this));
+}
+
+ClickBusPayments.prototype.done = function(status, response) {
+    var tokenElement = document.getElementById(this.options['tokenFieldId']);
+    console.log(status);
+    console.log(response);
+};
+
+ClickBusPayments.prototype.generateToken = function(event) {
+    event.preventDefault();
+    var form = document.getElementById(this.options['paymentFormId']);
+    Mercadopago.createToken(form, function(status, response) { return this.done(status, response) }.bind(this));
+
+    return false;
 };
 
 ClickBusPayments.prototype.start = function() {
     Mercadopago.setPublishableKey(config.public_key);
     this.loaded = true;
+
+    addEvent(
+        document.getElementById(this.options['paymentFormId']),
+        'submit',
+        function() { return this.generateToken(event) }.bind(this)
+    );
 };
 
 ClickBusPayments.prototype.updateForm = function() {
+    this.options = merge(this.options, arguments[0]);
+
     for (var fieldId in this.options) {
         var element = document.getElementById(this.options[fieldId]);
-        if (!element) throw new Error(this.options[fieldId] + ' is required');
-        element.setAttribute('data-checkout', this.attributeNames[fieldId]);
+
+        if (!element) {
+            var errorMessage = this.options[fieldId] + ' is required';
+            throw new Error(errorMessage);
+        }
+
+        if (this.attributeNames[fieldId]) {
+            element.setAttribute('data-checkout', this.attributeNames[fieldId]);
+        }
     }
-}
+};

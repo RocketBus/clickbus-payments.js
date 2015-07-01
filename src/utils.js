@@ -29,3 +29,23 @@ function loadScript(url, callback) {
     // Fire the loading
     head.appendChild(script);
 }
+
+/**
+ * Merge secundary array in the primary
+ *
+ * @param primary
+ * @param secundary
+ *
+ * @returns array
+ */
+function merge(primary, secundary) {
+    if (!arguments[0] || !(arguments[0] instanceof Object)) {
+        return primary;
+    }
+
+    for (var item in secundary) {
+        primary[item] = secundary[item];
+    }
+
+    return primary;
+}
