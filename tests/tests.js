@@ -16,13 +16,16 @@ QUnit.test('Clickbus instance validations', function(assert) {
 QUnit.test('Clickbus javascript injection', function(assert) {
     var done = assert.async();
 
-    var fields = '<input type="text" id="credit_card" />' +
+    var fields = '<form action="" id="payment_form" method="POST"/>' +
+        '<input type="hidden" id="token" />' +
+        '<input type="text" id="credit_card" />' +
         '<input type="text" id="security_code" />' +
         '<input type="text" id="expiration_month" />' +
         '<input type="text" id="expiration_year" />' +
         '<input type="text" id="holder_name" />' +
         '<input type="text" id="doc_type" />' +
-        '<input type="text" id="doc_number" />';
+        '<input type="text" id="doc_number" />' +
+        '</form>';
 
     document.getElementById('qunit-fixture').innerHTML = fields;
 
