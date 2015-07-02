@@ -45,9 +45,7 @@ function ClickBusPayments(options) {
 
     this.loaded = false;
 
-    this.callbackSuccess = function() {};
-    this.callbackFail = function() {};
-    this.callbackDone = function() {};
+    this.clickPromise = null;
 
     this.updateForm();
     loadScript(config.javascript_url, function() { return this.start() }.bind(this));
@@ -58,50 +56,36 @@ ClickBusPayments.prototype.finish = function(status, response) {
 
     try {
         if (status == 201) {
-            this.callbackSuccess(response.id);
+            this.clickPromise.callbackSuccess(response.id);
         } else {
-            //var errors = [];
-            //for (var cause in response.cause) {
-            //    errors.push(response.cause[cause]['description']);
-            //}
-            this.callbackFail('abcd');
+            var errors = [];
+            for (var cause in response.cause) {
+                errors.push(response.cause[cause]['description']);
+            }
+            this.clickPromise.callbackFail(errors);
         }
     } catch (e) {
         console.log(e);
-        this.callbackFail(e);
+        this.clickPromise.callbackFail(e);
     }
 
     this.callbackDone();
 };
 
-ClickBusPayments.prototype.generateToken = function(event) {
+ClickBusPayments.prototype.generateToken = function() {
     var form = document.getElementById(this.options['paymentFormId']);
-    Mercadopago.createToken(form, function(status, response) { return this.finish(status, response) }.bind(this));
 
-    return this;
+    this.clickPromise = new ClickPromise(function() {
+        Mercadopago.createToken(form, function(status, response) { return this.finish(status, response) }.bind(this));
+    });
+
+    return this.clickPromise;
 };
 
 ClickBusPayments.prototype.start = function() {
     Mercadopago.setPublishableKey(config.public_key);
     this.loaded = true;
 };
-
-ClickBusPayments.prototype.success = function(callback) {
-    this.callbackSuccess = callback;
-    return this;
-};
-
-ClickBusPayments.prototype.fail = function(callback) {
-    this.callbackFail = callback;
-    return this;
-};
-
-
-ClickBusPayments.prototype.done = function(callback) {
-    this.callbackDone = callback;
-    return this;
-};
-
 
 ClickBusPayments.prototype.updateForm = function() {
     this.options = merge(this.options, arguments[0]);
