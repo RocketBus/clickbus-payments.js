@@ -17,7 +17,6 @@ QUnit.test('Clickbus javascript injection', function(assert) {
     var done = assert.async();
 
     var fields = '<form action="" id="payment_form" method="POST"/>' +
-        '<input type="hidden" id="token" />' +
         '<input type="text" id="credit_card" />' +
         '<input type="text" id="security_code" />' +
         '<input type="text" id="expiration_month" />' +

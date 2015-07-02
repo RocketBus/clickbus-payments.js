@@ -10,7 +10,6 @@
  * Not Required:
  *
  *  - `paymentFormId`           HTML form id
- *  - `tokenFieldId`            HTML hidden field id where we'll put the generated token
  *  - `creditcardFieldId`       HTML field id for creditcard number, default credit_card
  *  - `securityCodeFieldId`     HTML field id for creditcard security code number, default security_code
  *  - `expirationMonthFieldId`  HTML field id for creditcard expiration month, default expiration_month
@@ -25,7 +24,6 @@
 function ClickBusPayments(options) {
     this.options = {
         paymentFormId: "payment_form",
-        tokenFieldId: "token",
         creditcardFieldId: "credit_card",
         securityCodeFieldId: "security_code",
         expirationMonthFieldId: "expiration_month",
@@ -47,34 +45,54 @@ function ClickBusPayments(options) {
 
     this.loaded = false;
 
+    this.callbackSuccess = function() {};
+    this.callbackFail = function() {};
+    this.callbackDone = function() {};
+
     this.updateForm();
-    loadScript(config.javascript_url, function() { return this.start()}.bind(this));
+    loadScript(config.javascript_url, function() { return this.start() }.bind(this));
 }
 
-ClickBusPayments.prototype.done = function(status, response) {
-    var tokenElement = document.getElementById(this.options['tokenFieldId']);
-    console.log(status);
+ClickBusPayments.prototype.finish = function(status, response) {
     console.log(response);
+
+    if (status == 201) {
+        this.callbackSuccess('token');
+    } else {
+        this.callbackFail('errors');
+    }
+
+    this.callbackDone();
 };
 
 ClickBusPayments.prototype.generateToken = function(event) {
-    event.preventDefault();
     var form = document.getElementById(this.options['paymentFormId']);
-    Mercadopago.createToken(form, function(status, response) { return this.done(status, response) }.bind(this));
+    Mercadopago.createToken(form, function(status, response) { return this.finish(status, response) }.bind(this));
 
-    return false;
+    return this;
 };
 
 ClickBusPayments.prototype.start = function() {
     Mercadopago.setPublishableKey(config.public_key);
     this.loaded = true;
-
-    addEvent(
-        document.getElementById(this.options['paymentFormId']),
-        'submit',
-        function() { return this.generateToken(event) }.bind(this)
-    );
 };
+
+ClickBusPayments.prototype.success = function(callback) {
+    this.callbackSuccess = callback;
+    return this;
+};
+
+ClickBusPayments.prototype.fail = function(callback) {
+    this.callbackFail = callback;
+    return this;
+};
+
+
+ClickBusPayments.prototype.done = function(callback) {
+    this.callbackDone = callback;
+    return this;
+};
+
 
 ClickBusPayments.prototype.updateForm = function() {
     this.options = merge(this.options, arguments[0]);
