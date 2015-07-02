@@ -6,7 +6,6 @@ function ClickPromise(callable) {
 
     this.callbackSuccess = function() {};
     this.callbackFail = function() {};
-    this.callbackDone = function() {};
 }
 
 ClickPromise.prototype.success = function(callback) {
@@ -16,11 +15,6 @@ ClickPromise.prototype.success = function(callback) {
 
 ClickPromise.prototype.fail = function(callback) {
     this.callbackFail = callback;
-    return this;
-};
-
-ClickPromise.prototype.done = function(callback) {
-    this.callbackDone = callback;
     return this;
 };
 
@@ -40,9 +34,6 @@ ClickPromise.prototype.finish = function(status, response) {
             this.callbackFail(errors);
         }
     } catch (e) {
-        console.log(e);
         this.callbackFail(e);
     }
-
-    this.callbackDone();
 };
