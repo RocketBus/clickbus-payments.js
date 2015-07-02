@@ -56,10 +56,19 @@ function ClickBusPayments(options) {
 ClickBusPayments.prototype.finish = function(status, response) {
     console.log(response);
 
-    if (status == 201) {
-        this.callbackSuccess('token');
-    } else {
-        this.callbackFail('errors');
+    try {
+        if (status == 201) {
+            this.callbackSuccess(response.id);
+        } else {
+            //var errors = [];
+            //for (var cause in response.cause) {
+            //    errors.push(response.cause[cause]['description']);
+            //}
+            this.callbackFail('abcd');
+        }
+    } catch (e) {
+        console.log(e);
+        this.callbackFail(e);
     }
 
     this.callbackDone();
