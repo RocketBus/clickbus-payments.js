@@ -6,7 +6,6 @@ function ClickPromise(callable) {
 
     this.callbackSuccess = function() {};
     this.callbackFail = function() {};
-    this.callbackDone = function() {};
 }
 
 ClickPromise.prototype.success = function(callback) {
@@ -16,11 +15,6 @@ ClickPromise.prototype.success = function(callback) {
 
 ClickPromise.prototype.fail = function(callback) {
     this.callbackFail = callback;
-    return this;
-};
-
-ClickPromise.prototype.done = function(callback) {
-    this.callbackDone = callback;
     return this;
 };
 
@@ -40,11 +34,8 @@ ClickPromise.prototype.finish = function(status, response) {
             this.callbackFail(errors);
         }
     } catch (e) {
-        console.log(e);
         this.callbackFail(e);
     }
-
-    this.callbackDone();
 };
 
 "use strict";
@@ -109,27 +100,6 @@ function ClickBusPayments(options) {
     this.updateForm();
     loadScript(config.javascript_url, function() { return this.start() }.bind(this));
 }
-
-ClickBusPayments.prototype.finish = function(status, response) {
-    console.log(response);
-
-    try {
-        if (status == 201) {
-            this.clickPromise.callbackSuccess(response.id);
-        } else {
-            var errors = [];
-            for (var cause in response.cause) {
-                errors.push(response.cause[cause]['description']);
-            }
-            this.clickPromise.callbackFail(errors);
-        }
-    } catch (e) {
-        console.log(e);
-        this.clickPromise.callbackFail(e);
-    }
-
-    this.callbackDone();
-};
 
 ClickBusPayments.prototype.generateToken = function() {
     var form = document.getElementById(this.options['paymentFormId']);

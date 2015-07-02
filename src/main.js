@@ -51,27 +51,6 @@ function ClickBusPayments(options) {
     loadScript(config.javascript_url, function() { return this.start() }.bind(this));
 }
 
-ClickBusPayments.prototype.finish = function(status, response) {
-    console.log(response);
-
-    try {
-        if (status == 201) {
-            this.clickPromise.callbackSuccess(response.id);
-        } else {
-            var errors = [];
-            for (var cause in response.cause) {
-                errors.push(response.cause[cause]['description']);
-            }
-            this.clickPromise.callbackFail(errors);
-        }
-    } catch (e) {
-        console.log(e);
-        this.clickPromise.callbackFail(e);
-    }
-
-    this.callbackDone();
-};
-
 ClickBusPayments.prototype.generateToken = function() {
     var form = document.getElementById(this.options['paymentFormId']);
 
