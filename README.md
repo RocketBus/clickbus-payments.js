@@ -20,7 +20,7 @@ It's the library to be implemented for Clickbus' clients who are integrating wit
     </p>
     <p>
         <label>Security Code: </label>
-        <input type="text" id="security_code" value="737" />
+        <input type="text" id="security_code_other_id" value="737" />
     </p>
     <p>
         <label>Expiration Month: </label>
@@ -52,7 +52,21 @@ It's the library to be implemented for Clickbus' clients who are integrating wit
     var clickbus = null;
 
     window.onload = function() {
-        clickbus = new ClickBusPayments();
+        /**
+         * If you have some form field with a different ID, just pass like an object in the constructor
+         *
+         *  - `paymentFormId`           HTML form id
+         *  - `creditcardFieldId`       HTML field id for creditcard number, default credit_card
+         *  - `securityCodeFieldId`     HTML field id for creditcard security code number, default security_code
+         *  - `expirationMonthFieldId`  HTML field id for creditcard expiration month, default expiration_month
+         *  - `expirationYearFieldId`   HTML field id for creditcard expiration year, default expiration_year
+         *  - `holderNameFieldId`       HTML field id for creditcard holder name, default holder_name
+         *  - `docTypeFieldId`          HTML field id for creditcard holder document type, default doc_type
+         *  - `docNumberFieldId`        HTML field id for creditcard holder document number, default doc_number
+         */
+        clickbus = new ClickBusPayments({
+            securityCodeFieldId: 'security_code_other_id'
+        });
     };
 
     function submitForm(event) {
