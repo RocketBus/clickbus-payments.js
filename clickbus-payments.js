@@ -73,7 +73,7 @@ var config = {
  * @param {Object} options
  * @api public
  */
-function ClickBusPayments(options) {
+function ClickBusPayments() {
     this.options = {
         paymentFormId: "payment_form",
         creditcardFieldId: "credit_card",
@@ -94,6 +94,8 @@ function ClickBusPayments(options) {
         docTypeFieldId: "docType",
         docNumberFieldId: "docNumber"
     };
+
+    this.personalizedOptions = arguments;
 
     this.loaded = false;
 
@@ -119,8 +121,7 @@ ClickBusPayments.prototype.start = function() {
 };
 
 ClickBusPayments.prototype.updateForm = function() {
-    this.options = merge(this.options, arguments[0]);
-
+    this.options = merge(this.options, this.personalizedOptions[0]);
     for (var fieldId in this.options) {
         var element = document.getElementById(this.options[fieldId]);
 
