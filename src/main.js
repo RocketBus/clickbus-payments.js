@@ -80,7 +80,6 @@ ClickBusPayments.prototype.getBin = function() {
 
 ClickBusPayments.prototype.setPaymentMethodInfo = function(status, response, object) {
     if (status == 200) {
-        console.log(response);
         object.paymentMethodId = response[0].id;
     }
 };
