@@ -3,8 +3,9 @@
 /**
  * Created by tiagobutzke on 7/2/15.
  */
-function ClickPromise(callable) {
+function ClickPromise(callable, clickbusPayments) {
     this.callable = callable;
+    this.clickbusPayments = clickbusPayments;
 
     this.callbackSuccess = function() {};
     this.callbackFail = function() {};
@@ -27,7 +28,10 @@ ClickPromise.prototype.call = function() {
 ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201) {
-            this.callbackSuccess(response.id);
+            this.callbackSuccess({
+                token: response.id,
+                payment_method: this.clickbusPayments.paymentMethodId
+            });
         } else {
             var errors = [];
             for (var cause in response.cause) {
@@ -36,6 +40,6 @@ ClickPromise.prototype.finish = function(status, response) {
             this.callbackFail(errors);
         }
     } catch (e) {
-        this.callbackFail(e);
+        this.callbackFail([e]);
     }
 };

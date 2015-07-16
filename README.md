@@ -72,8 +72,9 @@ It's the library to be implemented for Clickbus' clients who are integrating wit
     function submitForm(event) {
         event.preventDefault();
 
-        clickbus.generateToken().success(function(token) {
-            console.log(token);
+        clickbus.generateToken().success(function(response) {
+            console.log(response.token);
+            console.log(response.payment_method);
 
         }).fail(function(errors) {
             console.log(errors);

@@ -49,6 +49,8 @@ function ClickBusPayments() {
 
     this.clickPromise = null;
 
+    this.paymentMethodId = null;
+
     this.updateForm();
     loadScript(config.javascript_url, function() { return this.start() }.bind(this));
 }
@@ -56,16 +58,67 @@ function ClickBusPayments() {
 ClickBusPayments.prototype.generateToken = function() {
     var form = document.getElementById(this.options['paymentFormId']);
 
-    this.clickPromise = new ClickPromise(function() {
-        Mercadopago.createToken(form, function(status, response) { return this.finish(status, response) }.bind(this));
-    });
+    this.clickPromise = new ClickPromise(
+        function() {
+            Mercadopago.createToken(form, function(status, response) { return this.finish(status, response) }.bind(this));
+        },
+        this
+    );
 
     return this.clickPromise;
+};
+
+ClickBusPayments.prototype.getBin = function() {
+    var ccNumber = document.querySelector('input[data-checkout="cardNumber"]');
+
+    if (!ccNumber) {
+        throw new Error('creditcardFieldId is required');
+    }
+
+    return ccNumber.value.replace(/[ .-]/g, '').slice(0, 6);
+};
+
+ClickBusPayments.prototype.setPaymentMethodInfo = function(status, response, object) {
+    if (status == 200) {
+        console.log(response);
+        object.paymentMethodId = response[0].id;
+    }
+};
+
+ClickBusPayments.prototype.guessingPaymentMethod = function(event, object) {
+    var bin = this.getBin();
+
+    if (event.type == "keyup") {
+        if (bin.length >= 6) {
+            Mercadopago.getPaymentMethod({
+                "bin": bin
+            }, function(status, response) { object.setPaymentMethodInfo(status, response, object) }.bind(object));
+        }
+    } else {
+        setTimeout(function() {
+            if (bin.length >= 6) {
+                Mercadopago.getPaymentMethod({
+                    "bin": bin
+                }, function(status, response) { object.setPaymentMethodInfo(status, response, object) }.bind(object));
+            }
+        }, 100);
+    }
 };
 
 ClickBusPayments.prototype.start = function() {
     Mercadopago.setPublishableKey(config.public_key);
     this.loaded = true;
+
+    addEvent(
+        document.querySelector('input[data-checkout="cardNumber"]'),
+        'keyup',
+        function(event) { this.guessingPaymentMethod(event, this) }.bind(this)
+    );
+    addEvent(
+        document.querySelector('input[data-checkout="cardNumber"]'),
+        'change',
+        function(event) { this.guessingPaymentMethod(event, this) }.bind(this)
+    );
 };
 
 ClickBusPayments.prototype.updateForm = function() {
