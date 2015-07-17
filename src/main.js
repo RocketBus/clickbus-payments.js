@@ -43,6 +43,8 @@ function ClickBusPayments() {
         docNumberFieldId: "docNumber"
     };
 
+    this.optionalValues = { test: false };
+
     this.personalizedOptions = arguments;
 
     this.loaded = false;
@@ -50,10 +52,47 @@ function ClickBusPayments() {
     this.clickPromise = null;
 
     this.paymentMethodId = null;
+    this.test = (typeof this.personalizedOptions[0].test !== 'undefined') ? this.personalizedOptions[0].test : false;
 
     this.updateForm();
     loadScript(config.javascript_url, function() { return this.start() }.bind(this));
 }
+
+ClickBusPayments.prototype.start = function() {
+    var public_key = (this.test == true) ? config.public_key.test : config.public_key.live;
+    Mercadopago.setPublishableKey(public_key);
+    this.loaded = true;
+
+    addEvent(
+        document.querySelector('input[data-checkout="cardNumber"]'),
+        'keyup',
+        function(event) { this.guessingPaymentMethod(event, this) }.bind(this)
+    );
+    addEvent(
+        document.querySelector('input[data-checkout="cardNumber"]'),
+        'change',
+        function(event) { this.guessingPaymentMethod(event, this) }.bind(this)
+    );
+};
+
+ClickBusPayments.prototype.updateForm = function() {
+    this.options = merge(this.options, this.personalizedOptions[0]);
+    for (var fieldId in this.options) {
+        if (this.optionalValues.hasOwnProperty(fieldId)) {
+            continue;
+        }
+        var element = document.getElementById(this.options[fieldId]);
+
+        if (!element) {
+            var errorMessage = this.options[fieldId] + ' is required';
+            throw new Error(errorMessage);
+        }
+
+        if (this.attributeNames[fieldId]) {
+            element.setAttribute('data-checkout', this.attributeNames[fieldId]);
+        }
+    }
+};
 
 ClickBusPayments.prototype.generateToken = function() {
     var form = document.getElementById(this.options['paymentFormId']);
@@ -101,37 +140,5 @@ ClickBusPayments.prototype.guessingPaymentMethod = function(event, object) {
                 }, function(status, response) { object.setPaymentMethodInfo(status, response, object) }.bind(object));
             }
         }, 100);
-    }
-};
-
-ClickBusPayments.prototype.start = function() {
-    Mercadopago.setPublishableKey(config.public_key);
-    this.loaded = true;
-
-    addEvent(
-        document.querySelector('input[data-checkout="cardNumber"]'),
-        'keyup',
-        function(event) { this.guessingPaymentMethod(event, this) }.bind(this)
-    );
-    addEvent(
-        document.querySelector('input[data-checkout="cardNumber"]'),
-        'change',
-        function(event) { this.guessingPaymentMethod(event, this) }.bind(this)
-    );
-};
-
-ClickBusPayments.prototype.updateForm = function() {
-    this.options = merge(this.options, this.personalizedOptions[0]);
-    for (var fieldId in this.options) {
-        var element = document.getElementById(this.options[fieldId]);
-
-        if (!element) {
-            var errorMessage = this.options[fieldId] + ' is required';
-            throw new Error(errorMessage);
-        }
-
-        if (this.attributeNames[fieldId]) {
-            element.setAttribute('data-checkout', this.attributeNames[fieldId]);
-        }
     }
 };

@@ -5,5 +5,8 @@
  */
 var config = {
     javascript_url: "https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js?nocache=" + Math.random() * 10,
-    public_key: "TEST-c24e58b1-a4e0-40f6-adb4-a6ca7cf60209"
+    public_key: {
+        test: "TEST-c24e58b1-a4e0-40f6-adb4-a6ca7cf60209",
+        live: ""
+    }
 };
