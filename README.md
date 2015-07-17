@@ -63,9 +63,11 @@ It's the library to be implemented for Clickbus' clients who are integrating wit
          *  - `holderNameFieldId`       HTML field id for creditcard holder name, default holder_name
          *  - `docTypeFieldId`          HTML field id for creditcard holder document type, default doc_type
          *  - `docNumberFieldId`        HTML field id for creditcard holder document number, default doc_number
+         *  - `test`                    Can be true or false to define the environment
          */
         clickbus = new ClickBusPayments({
-            securityCodeFieldId: 'security_code_other_id'
+            securityCodeFieldId: 'security_code_other_id',
+            test: true
         });
     };
 
