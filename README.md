@@ -66,7 +66,13 @@ It's the library to be implemented for Clickbus' clients who are integrating wit
          *  - `test`                    Can be true or false to define the environment
          */
         clickbus = new ClickBusPayments({
+            paymentFormId: 'your_payment_form_id',
+            creditcardFieldId: 'your_creditcard_field_id',
             securityCodeFieldId: 'security_code_other_id',
+            expirationMonthFieldId: 'your_month_field_id',
+            expirationYearFieldId: 'your_year_field_id',
+            holderNameFieldId: 'your_holder_name_field_id',
+            docNumberFieldId: 'your_cpf_field_id',
             test: true
         });
     };
