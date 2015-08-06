@@ -63,17 +63,26 @@ It's the library to be implemented for Clickbus' clients who are integrating wit
          *  - `holderNameFieldId`       HTML field id for creditcard holder name, default holder_name
          *  - `docTypeFieldId`          HTML field id for creditcard holder document type, default doc_type
          *  - `docNumberFieldId`        HTML field id for creditcard holder document number, default doc_number
+         *  - `test`                    Can be true or false to define the environment
          */
         clickbus = new ClickBusPayments({
-            securityCodeFieldId: 'security_code_other_id'
+            paymentFormId: 'your_payment_form_id',
+            creditcardFieldId: 'your_creditcard_field_id',
+            securityCodeFieldId: 'security_code_other_id',
+            expirationMonthFieldId: 'your_month_field_id',
+            expirationYearFieldId: 'your_year_field_id',
+            holderNameFieldId: 'your_holder_name_field_id',
+            docNumberFieldId: 'your_cpf_field_id',
+            test: true
         });
     };
 
     function submitForm(event) {
         event.preventDefault();
 
-        clickbus.generateToken().success(function(token) {
-            console.log(token);
+        clickbus.generateToken().success(function(response) {
+            console.log(response.token);
+            console.log(response.payment_method);
 
         }).fail(function(errors) {
             for (var error in errors) {
