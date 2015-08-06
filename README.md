@@ -76,7 +76,10 @@ It's the library to be implemented for Clickbus' clients who are integrating wit
             console.log(token);
 
         }).fail(function(errors) {
-            console.log(errors);
+            for (var error in errors) {
+                console.log(errors[error].code);
+                console.log(errors[error].description);
+            }
 
         }).call();
 

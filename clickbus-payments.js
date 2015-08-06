@@ -31,7 +31,11 @@ ClickPromise.prototype.finish = function(status, response) {
         } else {
             var errors = [];
             for (var cause in response.cause) {
-                errors.push(response.cause[cause]['description']);
+                var error = {
+                    code: response.cause[cause]['code'],
+                    description: response.cause[cause]['description']
+                };
+                errors.push(error);
             }
             this.callbackFail(errors);
         }
