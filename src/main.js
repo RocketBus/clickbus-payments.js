@@ -58,6 +58,46 @@ function ClickBusPayments() {
     loadScript(config.javascript_url, function() { return this.start() }.bind(this));
 }
 
+ClickBusPayments.prototype.setPaymentFormId = function(paymentFormId) {
+    this.options.paymentFormId = paymentFormId;
+    return this;
+};
+
+ClickBusPayments.prototype.setCreditcardFieldId = function(creditcardFieldId) {
+    this.options.creditcardFieldId = creditcardFieldId;
+    return this;
+};
+
+ClickBusPayments.prototype.setSecurityCodeFieldId = function(securityCodeFieldId) {
+    this.options.securityCodeFieldId = securityCodeFieldId;
+    return this;
+};
+
+ClickBusPayments.prototype.setExpirationMonthFieldId = function(expirationMonthFieldId) {
+    this.options.expirationMonthFieldId = expirationMonthFieldId;
+    return this;
+};
+
+ClickBusPayments.prototype.setExpirationYearFieldId = function(expirationYearFieldId) {
+    this.options.expirationYearFieldId = expirationYearFieldId;
+    return this;
+};
+
+ClickBusPayments.prototype.setHolderNameFieldId = function(holderNameFieldId) {
+    this.options.holderNameFieldId = holderNameFieldId;
+    return this;
+};
+
+ClickBusPayments.prototype.setDocTypeFieldId = function(docTypeFieldId) {
+    this.options.docTypeFieldId = docTypeFieldId;
+    return this;
+};
+
+ClickBusPayments.prototype.setDocNumberFieldId = function(docNumberFieldId) {
+    this.options.docNumberFieldId = docNumberFieldId;
+    return this;
+};
+
 ClickBusPayments.prototype.start = function() {
     var public_key = (this.test == true) ? config.public_key.test : config.public_key.live;
     Mercadopago.setPublishableKey(public_key);
