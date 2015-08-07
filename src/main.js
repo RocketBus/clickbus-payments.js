@@ -60,48 +60,56 @@ function ClickBusPayments() {
 
 ClickBusPayments.prototype.setPaymentFormId = function(paymentFormId) {
     this.options.paymentFormId = paymentFormId;
+    this.personalizedOptions[0].paymentFormId = paymentFormId;
     this.updateForm();
     return this;
 };
 
 ClickBusPayments.prototype.setCreditcardFieldId = function(creditcardFieldId) {
     this.options.creditcardFieldId = creditcardFieldId;
+    this.personalizedOptions[0].creditcardFieldId = creditcardFieldId;
     this.updateForm();
     return this;
 };
 
 ClickBusPayments.prototype.setSecurityCodeFieldId = function(securityCodeFieldId) {
     this.options.securityCodeFieldId = securityCodeFieldId;
+    this.personalizedOptions[0].securityCodeFieldId = securityCodeFieldId;
     this.updateForm();
     return this;
 };
 
 ClickBusPayments.prototype.setExpirationMonthFieldId = function(expirationMonthFieldId) {
     this.options.expirationMonthFieldId = expirationMonthFieldId;
+    this.personalizedOptions[0].expirationMonthFieldId = expirationMonthFieldId;
     this.updateForm();
     return this;
 };
 
 ClickBusPayments.prototype.setExpirationYearFieldId = function(expirationYearFieldId) {
     this.options.expirationYearFieldId = expirationYearFieldId;
+    this.personalizedOptions[0].expirationYearFieldId = expirationYearFieldId;
     this.updateForm();
     return this;
 };
 
 ClickBusPayments.prototype.setHolderNameFieldId = function(holderNameFieldId) {
     this.options.holderNameFieldId = holderNameFieldId;
+    this.personalizedOptions[0].holderNameFieldId = holderNameFieldId;
     this.updateForm();
     return this;
 };
 
 ClickBusPayments.prototype.setDocTypeFieldId = function(docTypeFieldId) {
     this.options.docTypeFieldId = docTypeFieldId;
+    this.personalizedOptions[0].docTypeFieldId = docTypeFieldId;
     this.updateForm();
     return this;
 };
 
 ClickBusPayments.prototype.setDocNumberFieldId = function(docNumberFieldId) {
     this.options.docNumberFieldId = docNumberFieldId;
+    this.personalizedOptions[0].docNumberFieldId = docNumberFieldId;
     this.updateForm();
     return this;
 };
