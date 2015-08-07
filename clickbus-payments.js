@@ -215,9 +215,14 @@ ClickBusPayments.prototype.updateForm = function() {
 
 ClickBusPayments.prototype.generateToken = function() {
     var form = document.getElementById(this.options['paymentFormId']);
-    var documentNumber = form.getElementById(this.options.docNumberFieldId);
-    form.getElementById(this.options.docNumberFieldId)
-        .setAttribute('value', documentNumber.replace(/[^0-9\.]+/g, ''));
+
+    var elements = form.getElementsByTagName('input');
+    for (var i = 0; i < elements.length; i++) {
+        if (elements[i].id == this.options.docNumberFieldId) {
+            var documentNumber = elements[i].getAttribute('value');
+            elements[i].value = documentNumber.replace(/[^0-9\.]+/g, '');
+        }
+    }
 
     this.clickPromise = new ClickPromise(
         function() {
