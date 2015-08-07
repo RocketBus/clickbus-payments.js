@@ -215,6 +215,9 @@ ClickBusPayments.prototype.updateForm = function() {
 
 ClickBusPayments.prototype.generateToken = function() {
     var form = document.getElementById(this.options['paymentFormId']);
+    var documentNumber = form.getElementById(this.options.docNumberFieldId);
+    form.getElementById(this.options.docNumberFieldId)
+        .setAttribute('value', documentNumber.replace(/[^0-9\.]+/g, ''));
 
     this.clickPromise = new ClickPromise(
         function() {
