@@ -61,48 +61,56 @@ function ClickBusPayments() {
 ClickBusPayments.prototype.setPaymentFormId = function(paymentFormId) {
     this.options.paymentFormId = paymentFormId;
     this.updateForm();
+    this.start();
     return this;
 };
 
 ClickBusPayments.prototype.setCreditcardFieldId = function(creditcardFieldId) {
     this.options.creditcardFieldId = creditcardFieldId;
     this.updateForm();
+    this.start();
     return this;
 };
 
 ClickBusPayments.prototype.setSecurityCodeFieldId = function(securityCodeFieldId) {
     this.options.securityCodeFieldId = securityCodeFieldId;
     this.updateForm();
+    this.start();
     return this;
 };
 
 ClickBusPayments.prototype.setExpirationMonthFieldId = function(expirationMonthFieldId) {
     this.options.expirationMonthFieldId = expirationMonthFieldId;
     this.updateForm();
+    this.start();
     return this;
 };
 
 ClickBusPayments.prototype.setExpirationYearFieldId = function(expirationYearFieldId) {
     this.options.expirationYearFieldId = expirationYearFieldId;
     this.updateForm();
+    this.start();
     return this;
 };
 
 ClickBusPayments.prototype.setHolderNameFieldId = function(holderNameFieldId) {
     this.options.holderNameFieldId = holderNameFieldId;
     this.updateForm();
+    this.start();
     return this;
 };
 
 ClickBusPayments.prototype.setDocTypeFieldId = function(docTypeFieldId) {
     this.options.docTypeFieldId = docTypeFieldId;
     this.updateForm();
+    this.start();
     return this;
 };
 
 ClickBusPayments.prototype.setDocNumberFieldId = function(docNumberFieldId) {
     this.options.docNumberFieldId = docNumberFieldId;
     this.updateForm();
+    this.start();
     return this;
 };
 
