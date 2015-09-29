@@ -27,7 +27,7 @@ ClickPromise.prototype.call = function() {
 
 ClickPromise.prototype.finish = function(status, response) {
     try {
-        if (status == 201) {
+        if (status == 201 || status == 200) {
             this.callbackSuccess({
                 token: response.id,
                 payment_method: this.clickbusPayments.paymentMethodId
