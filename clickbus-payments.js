@@ -80,6 +80,7 @@ var config = {
  *  - `holderNameFieldId`       HTML field id for creditcard holder name, default holder_name
  *  - `docTypeFieldId`          HTML field id for creditcard holder document type, default doc_type
  *  - `docNumberFieldId`        HTML field id for creditcard holder document number, default doc_number
+ *  - `amountFieldId`           HTML field id for amount value, default amount
  *
  * @param {Object} options
  * @api public
@@ -93,7 +94,8 @@ function ClickBusPayments() {
         expirationYearFieldId: "expiration_year",
         holderNameFieldId: "holder_name",
         docTypeFieldId: "doc_type",
-        docNumberFieldId: "doc_number"
+        docNumberFieldId: "doc_number",
+        amountFieldId: "amount"
     };
 
     this.attributeNames = {
@@ -106,7 +108,7 @@ function ClickBusPayments() {
         docNumberFieldId: "docNumber"
     };
 
-    this.optionalValues = { test: false };
+    this.optionalValues = { test: false, amountFieldId: false };
 
     this.personalizedOptions = arguments;
 
@@ -114,6 +116,7 @@ function ClickBusPayments() {
 
     this.clickPromise = null;
 
+    this.installments = [1];
     this.paymentMethodId = null;
     this.test = (typeof this.personalizedOptions[0].test !== 'undefined') ? this.personalizedOptions[0].test : false;
 
@@ -180,6 +183,14 @@ ClickBusPayments.prototype.setDocTypeFieldId = function(docTypeFieldId) {
 ClickBusPayments.prototype.setDocNumberFieldId = function(docNumberFieldId) {
     this.options.docNumberFieldId = docNumberFieldId;
     this.personalizedOptions[0].docNumberFieldId = docNumberFieldId;
+    this.updateForm();
+    this.start();
+    return this;
+};
+
+ClickBusPayments.prototype.setAmountFieldId = function(amountFieldId) {
+    this.options.amountFieldId = amountFieldId;
+    this.personalizedOptions[0].amountFieldId = amountFieldId;
     this.updateForm();
     this.start();
     return this;
@@ -255,6 +266,7 @@ ClickBusPayments.prototype.getBin = function() {
 ClickBusPayments.prototype.setPaymentMethodInfo = function(status, response, object) {
     if (status == 200) {
         object.paymentMethodId = response[0].id;
+        object.getInstallments(object);
     }
 };
 
@@ -275,6 +287,38 @@ ClickBusPayments.prototype.guessingPaymentMethod = function(event, object) {
                 }, function(status, response) { object.setPaymentMethodInfo(status, response, object) }.bind(object));
             }
         }, 100);
+    }
+};
+
+ClickBusPayments.prototype.getAmount = function() {
+    var amount = document.getElementById(this.options.amountFieldId);
+
+    if (!amount) {
+        throw new Error('amountFieldId is required to get installments');
+    }
+
+    return amount.value;
+};
+
+ClickBusPayments.prototype.getInstallments = function(object) {
+    var bin = this.getBin(),
+        amount = this.getAmount();
+
+    Mercadopago.getInstallments({
+            "bin": bin,
+            "amount": amount
+        }, function(status, response) { object.setInstallmentsInfo(status, response, object) }.bind(object));
+};
+
+ClickBusPayments.prototype.setInstallmentsInfo = function(status, response, object) {
+    if (response.length > 0) {
+        var payerCosts = response[0].payer_costs;
+        if(payerCosts.length > 0){
+            object.installments = [];
+        }
+        for (var i=0; i < payerCosts.length; i++) {
+            object.installments.push(payerCosts[i].installments);
+        }
     }
 };
 
