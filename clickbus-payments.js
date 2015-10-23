@@ -28,10 +28,13 @@ ClickPromise.prototype.call = function() {
 ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
-            this.callbackSuccess({
+            var responseSuccessObject = {
                 token: response.id,
                 payment_method: this.clickbusPayments.paymentMethodId
-            });
+            };
+
+            this.clickbusPayments.token = response.id;
+            this.callbackSuccess(responseSuccessObject);
         } else {
             var errors = [];
             for (var cause in response.cause) {
@@ -118,6 +121,9 @@ function ClickBusPayments() {
 
     this.installments = [1];
     this.paymentMethodId = null;
+
+    this.token = null;
+
     this.test = (typeof this.personalizedOptions[0].test !== 'undefined') ? this.personalizedOptions[0].test : false;
 
     this.updateForm();
@@ -241,6 +247,11 @@ ClickBusPayments.prototype.generateToken = function() {
             var documentNumber = elements[i].value;
             elements[i].value = documentNumber.replace(/[^0-9\.]+/g, '');
         }
+    }
+
+    if (this.token != null) {
+        console.log('[DEBUG] - Clearing token: ' + this.token);
+        Mercadopago.clearSession();
     }
 
     this.clickPromise = new ClickPromise(

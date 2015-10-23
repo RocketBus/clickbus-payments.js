@@ -28,10 +28,13 @@ ClickPromise.prototype.call = function() {
 ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
-            this.callbackSuccess({
+            var responseSuccessObject = {
                 token: response.id,
                 payment_method: this.clickbusPayments.paymentMethodId
-            });
+            };
+
+            this.clickbusPayments.token = response.id;
+            this.callbackSuccess(responseSuccessObject);
         } else {
             var errors = [];
             for (var cause in response.cause) {
