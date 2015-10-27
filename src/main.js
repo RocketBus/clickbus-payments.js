@@ -176,7 +176,7 @@ ClickBusPayments.prototype.generateToken = function() {
     for (var i = 0; i < elements.length; i++) {
         if (elements[i].id == this.options.docNumberFieldId) {
             var documentNumber = elements[i].value;
-            elements[i].value = documentNumber.replace(/[^0-9\.]+/g, '');
+            elements[i].value = documentNumber.replace(/[^0-9]+/g, '');
         }
     }
 
