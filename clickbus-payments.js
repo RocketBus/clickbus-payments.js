@@ -325,10 +325,14 @@ ClickBusPayments.prototype.getInstallments = function(object) {
     var bin = this.getBin(),
         amount = this.getAmount();
 
-    Mercadopago.getInstallments({
+    if (bin.length >= 6) {
+        Mercadopago.getInstallments({
             "bin": bin,
             "amount": amount
-        }, function(status, response) { object.setInstallmentsInfo(status, response, object) }.bind(object));
+        }, function (status, response) {
+            object.setInstallmentsInfo(status, response, object)
+        }.bind(object));
+    }
 };
 
 ClickBusPayments.prototype.setInstallmentsInfo = function(status, response, object) {
