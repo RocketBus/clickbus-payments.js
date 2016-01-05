@@ -45,7 +45,7 @@ function ClickBusPayments() {
         docNumberFieldId: "docNumber"
     };
 
-    this.optionalValues = { test: false, amountFieldId: false };
+    this.optionalValues = { test: false, amountFieldId: false, useDynamicInstallments: false };
 
     this.personalizedOptions = arguments;
 
@@ -59,6 +59,7 @@ function ClickBusPayments() {
     this.token = null;
 
     this.test = (typeof this.personalizedOptions[0].test !== 'undefined') ? this.personalizedOptions[0].test : false;
+    this.useDynamicInstallments = (typeof this.personalizedOptions[0].useDynamicInstallments !== 'undefined') ? this.personalizedOptions[0].useDynamicInstallments : false;
 
     this.updateForm();
     loadScript(config.javascript_url, function() { return this.start() }.bind(this));
@@ -144,12 +145,22 @@ ClickBusPayments.prototype.start = function() {
     addEvent(
         document.querySelector('input[data-checkout="cardNumber"]'),
         'keyup',
-        function(event) { this.guessingPaymentMethod(event, this) }.bind(this)
+        function(event) {
+            this.guessingPaymentMethod(event, this);
+            if (this.useDynamicInstallments !== false) {
+                this.getInstallments(this);
+            }
+        }.bind(this)
     );
     addEvent(
         document.querySelector('input[data-checkout="cardNumber"]'),
         'change',
-        function(event) { this.guessingPaymentMethod(event, this) }.bind(this)
+        function(event) {
+            this.guessingPaymentMethod(event, this);
+            if (this.useDynamicInstallments !== false) {
+                this.getInstallments(this);
+            }
+        }.bind(this)
     );
 };
 
@@ -211,7 +222,6 @@ ClickBusPayments.prototype.getBin = function() {
 ClickBusPayments.prototype.setPaymentMethodInfo = function(status, response, object) {
     if (status == 200) {
         object.paymentMethodId = response[0].id;
-        object.getInstallments(object);
     }
 };
 
@@ -249,10 +259,14 @@ ClickBusPayments.prototype.getInstallments = function(object) {
     var bin = this.getBin(),
         amount = this.getAmount();
 
-    Mercadopago.getInstallments({
+    if (bin.length >= 6) {
+        Mercadopago.getInstallments({
             "bin": bin,
             "amount": amount
-        }, function(status, response) { object.setInstallmentsInfo(status, response, object) }.bind(object));
+        }, function (status, response) {
+            object.setInstallmentsInfo(status, response, object)
+        }.bind(object));
+    }
 };
 
 ClickBusPayments.prototype.setInstallmentsInfo = function(status, response, object) {
