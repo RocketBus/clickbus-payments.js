@@ -111,7 +111,15 @@ function ClickBusPayments() {
         docNumberFieldId: "docNumber"
     };
 
-    this.optionalValues = { test: false, amountFieldId: false, useDynamicInstallments: false };
+    this.optionalValues = {
+        test: false,
+        amountFieldId: false,
+        useDynamicInstallments: false,
+        public_key: {
+            test: false,
+            live: false
+        } 
+    };
 
     this.personalizedOptions = arguments;
 
@@ -204,7 +212,23 @@ ClickBusPayments.prototype.setAmountFieldId = function(amountFieldId) {
 };
 
 ClickBusPayments.prototype.start = function() {
-    var public_key = (this.test == true) ? config.public_key.test : config.public_key.live;
+    var public_key;
+    if (this.test == true) {
+        if (this.optionalValues.public_key.test !== false) {
+            public_key = this.optionalValues.public_key.test;
+        } else {
+            public_key = config.public_key.test;
+        }
+    } else {
+        if (this.optionalValues.public_key.live !== false) {
+            public_key = this.optionalValues.public_key.live;
+        } else {
+            public_key = config.public_key.live;
+        }
+    }
+    
+    console.log(public_key);
+    
     Mercadopago.setPublishableKey(public_key);
     this.loaded = true;
 

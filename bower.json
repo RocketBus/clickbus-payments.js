@@ -19,7 +19,7 @@
   "moduleType": [
     "globals"
   ],
-  "private": true,
+  "private": false,
   "ignore": [
     "**/.*",
     "node_modules",
