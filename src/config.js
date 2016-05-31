@@ -6,7 +6,7 @@
 var config = {
     javascript_url: "https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js?nocache=" + Math.random() * 10,
     public_key: {
-        test: "TEST-c24e58b1-a4e0-40f6-adb4-a6ca7cf60209",
-        live: "APP_USR-41ff8f64-11f2-47d7-91fb-ca4db9086c15"
+        test: "TEST-6db251ae-f307-45c0-9236-dc52fae6fe24",
+        live: "APP_USR-21fadfe8-805c-4f88-b483-2ddb7da31318"
     }
 };
