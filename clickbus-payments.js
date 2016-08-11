@@ -276,6 +276,10 @@ ClickBusPayments.prototype.generateToken = function() {
         Mercadopago.clearSession();
     }
 
+    if (this.paymentMethodId === null) {
+        this.guessingPaymentMethod(null, this);
+    }
+
     this.clickPromise = new ClickPromise(
         function() {
             Mercadopago.createToken(form, function(status, response) { return this.finish(status, response) }.bind(this));
@@ -305,7 +309,7 @@ ClickBusPayments.prototype.setPaymentMethodInfo = function(status, response, obj
 ClickBusPayments.prototype.guessingPaymentMethod = function(event, object) {
     var bin = this.getBin();
 
-    if (event.type == "keyup") {
+    if (event != null && event.type == "keyup") {
         if (bin.length >= 6) {
             Mercadopago.getPaymentMethod({
                 "bin": bin
