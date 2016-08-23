@@ -12,7 +12,7 @@
             input { width: 200px; height: 25px; font-size: 14px; }
             label { font-weight: bold; }
             .result { height: 60px; width: 290px; border: 1px solid #000; font-style: italic; font-size: 12px; }
-            section { float: left; width: 250px; background: #fff; margin-right: 10px; }
+            section { float: left; width: 300px; background: #fff; margin-right: 10px; }
             .demo { width: 350px; }
         </style>
     </head>
@@ -82,8 +82,8 @@
                 </div>
             </section>
         </div>
-        
-        <script src="clickbus-payments-min.js"></script>
+
+        <script src="../clickbus-payments.js"></script>
         <script>
             var clickbus = null;
 
@@ -98,43 +98,42 @@
                     holderNameFieldId: 'holder_name',
                     docTypeFieldId: 'doc_type',
                     docNumberFieldId: 'doc_number',
-                    test: true //,
-//                    publicKey: {
-//                        test: "TEST-c24e58b1-a4e0-40f6-adb4-a6ca7cf60209",
-//                        live: "APP_USR-41ff8f64-11f2-47d7-91fb-ca4db9086c15"
-//                    }
+                    amountFieldId: 'ammount'
                 });
+
+                clickbus.subscribe(new MercadoPago('TEST-c24e58b1-a4e0-40f6-adb4-a6ca7cf60209'));
+                clickbus.subscribe(new MundiPagg('7ac3cf57-7163-446f-aa92-812369516d08'));
+                clickbus.init();
             };
 
             // Then, adding am event to generate the token.
             function submitForm(event) {
                 event.preventDefault();
-                
-                document.getElementById('token').textContent = '';
-                document.getElementById('brand').textContent =  '';
-                document.getElementById('code').textContent =  '';
-                document.getElementById('message').textContent =  '';
 
-                clickbus.generateToken().success(function(response) {
-                    console.log(response.token);
-                    console.log(response.payment_method);
-                    
-                    document.getElementById('token').textContent = response.token;
-                    document.getElementById('brand').textContent = response.payment_method;
-                }).fail(function(errors) {
-                    for (var error in errors) {
-                        console.log(errors[error].code);
-                        console.log(errors[error].description);
-                        
-                        document.getElementById('code').textContent = errors[error].code;
-                        document.getElementById('message').textContent = errors[error].description;
-                    }
+                document.getElementById('token').innerHTML = '';
+                document.getElementById('brand').innerHTML =  '';
+                document.getElementById('code').innerHTML =  '';
+                document.getElementById('message').innerHTML =  '';
 
+                clickbus.generateToken('creditcard').success(function(response) {
+                        console.log(response);
+
+                        for(var key in response) {
+                            var gateway = response[key];
+                            document.getElementById('token').innerHTML += gateway.name + ' - ' + gateway.token + '<br>';
+                            document.getElementById('brand').innerHTML += gateway.name + ' - ' + gateway.payment_method + "<br>";
+                        }
+                    }).fail(function(errors) {
+                        console.log(errors);
+                        // for (var error in errors) {
+                        //     document.getElementById('code').innerHTML = errors[error].code + '<br>';
+                        //     document.getElementById('message').innerHTML = errors[error].description + '<br>';
+                        // }
                 }).call();
 
                 return false;
             }
         </script>
-        
+
     </body>
 </html>

@@ -7,6 +7,10 @@ function ClickPromise(callable, clickbusPayments) {
     this.callable = callable;
     this.clickbusPayments = clickbusPayments;
 
+    this.errorPromises = 0;
+    this.successPromises = 0;
+    this.totalPromises = clickbusPayments.gateways.length;
+
     this.callbackSuccess = function() {};
     this.callbackFail = function() {};
 }
@@ -28,30 +32,34 @@ ClickPromise.prototype.call = function() {
 ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
-            
+
             if (this.clickbusPayments.paymentMethodId === 'master') {
                 this.clickbusPayments.paymentMethodId = 'mastercard';
             }
-            
+
             var responseSuccessObject = {
+                name: response.name,
                 token: response.id,
-                payment_method: this.clickbusPayments.paymentMethodId
+                payment_method: this.clickbusPayments.cardBrand
             };
 
-            this.clickbusPayments.token = response.id;
-            this.callbackSuccess(responseSuccessObject);
+            this.successPromises++;
+            this.clickbusPayments.successResponse[response.name] = responseSuccessObject;
         } else {
-            var errors = [];
-            for (var cause in response.cause) {
-                var error = {
-                    code: response.cause[cause]['code'],
-                    description: response.cause[cause]['description']
-                };
-                errors.push(error);
-            }
-            this.callbackFail(errors);
+            this.errorPromises++;
+            this.clickbusPayments.errorResponse[response.name] = response.cause;
         }
     } catch (e) {
-        this.callbackFail([e]);
+        this.errorPromises++;
+        this.clickbusPayments.errorResponse[response.name] = [e];
+    } finally {
+        if (this.errorPromises == this.totalPromises) {
+            this.callbackFail(this.clickbusPayments.errorResponse);
+            return;
+        }
+
+        if ((this.successPromises + this.errorPromises) == this.totalPromises) {
+            this.callbackSuccess(this.clickbusPayments.successResponse);
+        }
     }
 };
