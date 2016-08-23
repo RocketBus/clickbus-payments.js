@@ -6,6 +6,7 @@
 function ClickPromise(callable, clickbusPayments) {
     this.callable = callable;
     this.clickbusPayments = clickbusPayments;
+    this.count = 0;
 
     this.callbackSuccess = function() {};
     this.callbackFail = function() {};
@@ -28,18 +29,22 @@ ClickPromise.prototype.call = function() {
 ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
-            
+
             if (this.clickbusPayments.paymentMethodId === 'master') {
                 this.clickbusPayments.paymentMethodId = 'mastercard';
             }
-            
+
             var responseSuccessObject = {
+                name: response.name,
                 token: response.id,
                 payment_method: this.clickbusPayments.paymentMethodId
             };
 
-            this.clickbusPayments.token = response.id;
-            this.callbackSuccess(responseSuccessObject);
+            this.count++;
+            this.clickbusPayments.token[response.name] = responseSuccessObject;
+            if (this.count == this.clickbusPayments.handlers.length) {
+                this.callbackSuccess(this.clickbusPayments.token);
+            }
         } else {
             var errors = [];
             for (var cause in response.cause) {

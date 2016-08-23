@@ -4,7 +4,7 @@ var rename = require("gulp-rename");
 var concat = require('gulp-concat');
 var qunit = require('gulp-qunit');
 
-var pathJs = 'src/*.js';
+var pathJs = 'src/**/*.js';
 var destinationJs = '.';
 
 gulp.task('uglify', function() {

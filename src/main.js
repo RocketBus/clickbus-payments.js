@@ -48,27 +48,28 @@ function ClickBusPayments() {
     this.optionalValues = {
         test: false,
         amountFieldId: false,
-        useDynamicInstallments: false,
         publicKey: false
     };
+
+    this.handlers = [];
 
     this.personalizedOptions = arguments;
 
     this.loaded = false;
 
-    this.clickPromise = null;
+    this.clickPromise = [];
 
-    this.installments = [1];
     this.paymentMethodId = null;
 
-    this.token = null;
+    this.token = {};
 
     this.test = (typeof this.personalizedOptions[0].test !== 'undefined') ? this.personalizedOptions[0].test : false;
-    this.useDynamicInstallments = (typeof this.personalizedOptions[0].useDynamicInstallments !== 'undefined') ? this.personalizedOptions[0].useDynamicInstallments : false;
-    this.publicKey = (typeof this.personalizedOptions[0].publicKey !== 'undefined') ? this.personalizedOptions[0].publicKey : config.public_key;
 
     this.updateForm();
-    loadScript(config.javascript_url, function() { return this.start() }.bind(this));
+}
+
+ClickBusPayments.prototype.init = function() {
+    this.start();
 }
 
 ClickBusPayments.prototype.setPaymentFormId = function(paymentFormId) {
@@ -143,31 +144,15 @@ ClickBusPayments.prototype.setAmountFieldId = function(amountFieldId) {
     return this;
 };
 
-ClickBusPayments.prototype.start = function() {
-    var public_key = (this.test == true) ? this.publicKey.test : this.publicKey.live;
-    Mercadopago.setPublishableKey(public_key);
-    this.loaded = true;
+ClickBusPayments.prototype.subscribe = function(gateway) {
+  this.handlers.push(gateway);
+};
 
-    addEvent(
-        document.querySelector('input[data-checkout="cardNumber"]'),
-        'keyup',
-        function(event) {
-            this.guessingPaymentMethod(event, this);
-            if (this.useDynamicInstallments !== false) {
-                this.getInstallments(this);
-            }
-        }.bind(this)
-    );
-    addEvent(
-        document.querySelector('input[data-checkout="cardNumber"]'),
-        'change',
-        function(event) {
-            this.guessingPaymentMethod(event, this);
-            if (this.useDynamicInstallments !== false) {
-                this.getInstallments(this);
-            }
-        }.bind(this)
-    );
+ClickBusPayments.prototype.start = function() {
+    this.handlers.forEach(function(gateway) {
+        gateway['start']();
+    });
+    this.loaded = true;
 };
 
 ClickBusPayments.prototype.updateForm = function() {
@@ -200,18 +185,15 @@ ClickBusPayments.prototype.generateToken = function() {
         }
     }
 
-    if (this.token != null) {
-        console.log('[DEBUG] - Clearing token: ' + this.token);
-        Mercadopago.clearSession();
-    }
-
     if (this.paymentMethodId === null) {
         this.guessingPaymentMethod(null, this);
     }
 
     this.clickPromise = new ClickPromise(
         function() {
-            Mercadopago.createToken(form, function(status, response) { return this.finish(status, response) }.bind(this));
+            this.clickbusPayments.handlers.forEach(function(gateway) {
+                gateway.createToken(form, this);
+            }, this);
         },
         this
     );
@@ -263,30 +245,4 @@ ClickBusPayments.prototype.getAmount = function() {
     }
 
     return amount.value;
-};
-
-ClickBusPayments.prototype.getInstallments = function(object) {
-    var bin = this.getBin(),
-        amount = this.getAmount();
-
-    if (bin.length >= 6) {
-        Mercadopago.getInstallments({
-            "bin": bin,
-            "amount": amount
-        }, function (status, response) {
-            object.setInstallmentsInfo(status, response, object)
-        }.bind(object));
-    }
-};
-
-ClickBusPayments.prototype.setInstallmentsInfo = function(status, response, object) {
-    if (response.length > 0) {
-        var payerCosts = response[0].payer_costs;
-        if(payerCosts.length > 0){
-            object.installments = [];
-        }
-        for (var i=0; i < payerCosts.length; i++) {
-            object.installments.push(payerCosts[i].installments);
-        }
-    }
 };
