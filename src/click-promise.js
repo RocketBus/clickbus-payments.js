@@ -39,8 +39,7 @@ ClickPromise.prototype.finish = function(status, response) {
 
             var responseSuccessObject = {
                 name: response.name,
-                token: response.id,
-                payment_method: this.clickbusPayments.cardBrand
+                token: response.id
             };
 
             this.successPromises++;

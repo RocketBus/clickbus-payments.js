@@ -180,7 +180,8 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
         }
     }
 
-    this.cardBrand = this.getCardBrand();
+    this.successResponse.brand = this.getCardBrand();
+
     this.clickPromise = new ClickPromise(
         function() {
             var gateways = this.clickbusPayments.gateways;

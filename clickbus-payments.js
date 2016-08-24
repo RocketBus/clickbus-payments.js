@@ -39,8 +39,7 @@ ClickPromise.prototype.finish = function(status, response) {
 
             var responseSuccessObject = {
                 name: response.name,
-                token: response.id,
-                payment_method: this.clickbusPayments.cardBrand
+                token: response.id
             };
 
             this.successPromises++;
@@ -246,7 +245,7 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
         }
     }
 
-    this.cardBrand = this.getCardBrand();
+    this.successResponse.brand = this.getCardBrand();
     this.clickPromise = new ClickPromise(
         function() {
             var gateways = this.clickbusPayments.gateways;
