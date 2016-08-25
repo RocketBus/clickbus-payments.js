@@ -65,6 +65,7 @@ function ClickBusPayments() {
 
 ClickBusPayments.prototype.init = function() {
     this.start();
+    this.successResponse['token'] = {};
 }
 
 ClickBusPayments.prototype.setPaymentFormId = function(paymentFormId) {
@@ -187,11 +188,9 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
         }
     }
 
-    if (gatewayType == 'creditcard') {
+    if (gatewayType == 'credit_card') {
         this.successResponse.brand = this.getCardBrand();
     }
-
-    this.successResponse['token'] = {};
 
     this.clickPromise = new ClickPromise(
         function() {

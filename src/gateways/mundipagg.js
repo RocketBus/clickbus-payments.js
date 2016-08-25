@@ -1,7 +1,7 @@
 "use strict";
 
 function MundiPagg(publicKey, isTest) {
-    this.type = 'creditcard';
+    this.type = 'credit_card';
     this.name = 'mundipagg';
     this.publicKey = publicKey;
 }

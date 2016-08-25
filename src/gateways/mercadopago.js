@@ -1,7 +1,7 @@
 "use strict";
 
 function MercadoPago(publicKey) {
-    this.type = 'creditcard'
+    this.type = 'credit_card'
     this.name = 'mercadopago';
     this.publicKey = publicKey;
     this.gatewayUrl = "https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js?nocache=" + Math.random() * 10;
@@ -14,8 +14,8 @@ MercadoPago.prototype.start = function() {
 }
 
 MercadoPago.prototype.createToken = function(form, clickPromise) {
-    var clickbusPayments = clickPromise.clickbusPayments;
-    if (clickbusPayments.successResponse.hasOwnProperty(this.name)) {
+    var token = clickPromise.clickbusPayments.successResponse.token;
+    if (token.hasOwnProperty(this.name)) {
         this.clearSession();
     }
 

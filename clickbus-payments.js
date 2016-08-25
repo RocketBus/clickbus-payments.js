@@ -120,6 +120,7 @@ function ClickBusPayments() {
 
 ClickBusPayments.prototype.init = function() {
     this.start();
+    this.successResponse['token'] = {};
 }
 
 ClickBusPayments.prototype.setPaymentFormId = function(paymentFormId) {
@@ -242,11 +243,9 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
         }
     }
 
-    if (gatewayType == 'creditcard') {
+    if (gatewayType == 'credit_card') {
         this.successResponse.brand = this.getCardBrand();
     }
-
-    this.successResponse['token'] = {};
 
     this.clickPromise = new ClickPromise(
         function() {
@@ -420,7 +419,7 @@ function merge(primary, secundary) {
 "use strict";
 
 function MercadoPago(publicKey) {
-    this.type = 'creditcard'
+    this.type = 'credit_card'
     this.name = 'mercadopago';
     this.publicKey = publicKey;
     this.gatewayUrl = "https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js?nocache=" + Math.random() * 10;
@@ -433,8 +432,8 @@ MercadoPago.prototype.start = function() {
 }
 
 MercadoPago.prototype.createToken = function(form, clickPromise) {
-    var clickbusPayments = clickPromise.clickbusPayments;
-    if (clickbusPayments.successResponse.hasOwnProperty(this.name)) {
+    var token = clickPromise.clickbusPayments.successResponse.token;
+    if (token.hasOwnProperty(this.name)) {
         this.clearSession();
     }
 
@@ -451,7 +450,7 @@ MercadoPago.prototype.clearSession = function() {
 "use strict";
 
 function MundiPagg(publicKey, isTest) {
-    this.type = 'creditcard';
+    this.type = 'credit_card';
     this.name = 'mundipagg';
     this.publicKey = publicKey;
 }
