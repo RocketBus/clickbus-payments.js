@@ -32,14 +32,8 @@ ClickPromise.prototype.call = function() {
 ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
-            var responseSuccessObject = {
-                name: response.name,
-                token: response.id,
-                brand: response.brand
-            };
-
             this.successPromises++;
-            this.clickbusPayments.successResponse[response.name] = responseSuccessObject;
+            this.clickbusPayments.successResponse['token'][response.name] = response.id;
         } else {
             this.errorPromises++;
             this.clickbusPayments.errorResponse[response.name] = response.cause;

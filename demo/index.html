@@ -123,10 +123,10 @@
                 clickbus.generateToken('creditcard').success(function(response) {
                         console.log(response);
 
-                        for(var key in response) {
-                            var gateway = response[key];
-                            document.getElementById('token').innerHTML += gateway.name + ' - ' + gateway.token + '<br>';
-                            document.getElementById('brand').innerHTML += gateway.name + ' - ' + gateway.card + "<br>";
+                        for(var key in response.token) {
+                            var gateway = response.token[key];
+                            document.getElementById('token').innerHTML += key + ' - ' + gateway + '<br>';
+                            document.getElementById('brand').innerHTML += key + ' - ' + response.brand + "<br>";
                         }
                     }).fail(function(errors) {
                         console.log(errors);

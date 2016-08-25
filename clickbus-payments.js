@@ -32,14 +32,8 @@ ClickPromise.prototype.call = function() {
 ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
-            var responseSuccessObject = {
-                name: response.name,
-                token: response.id,
-                brand: response.brand
-            };
-
             this.successPromises++;
-            this.clickbusPayments.successResponse[response.name] = responseSuccessObject;
+            this.clickbusPayments.successResponse['token'][response.name] = response.id;
         } else {
             this.errorPromises++;
             this.clickbusPayments.errorResponse[response.name] = response.cause;
@@ -248,6 +242,12 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
         }
     }
 
+    if (gatewayType == 'creditcard') {
+        this.successResponse.brand = this.getCardBrand();
+    }
+
+    this.successResponse['token'] = {};
+
     this.clickPromise = new ClickPromise(
         function() {
             var gateways = this.clickbusPayments.gateways;
@@ -440,7 +440,6 @@ MercadoPago.prototype.createToken = function(form, clickPromise) {
 
     Mercadopago.createToken(form, function(status, response) {
         response.name = this.name;
-        response.brand = clickbusPayments.getCardBrand();
         clickPromise.finish(status, response);
     }.bind(this));
 }
@@ -470,9 +469,9 @@ MundiPagg.prototype.createToken = function(form, clickPromise) {
     request.onload = function() {
         var response = JSON.parse(request.response);
         if (request.status == 201) {
-            var brand = clickbusPayments.getCardBrand();
             var token = response.CreditCardTransactionResultCollection[0].CreditCard.InstantBuyKey;
-            clickPromise.finish(request.status, {id: token, name: this.name, brand: brand});
+            clickPromise.finish(request.status, {id: token, name: this.name});
+            return;
         }
 
         clickPromise.finish(request.status, {name: this.name, cause: response.ErrorReport});

@@ -19,9 +19,9 @@ MundiPagg.prototype.createToken = function(form, clickPromise) {
     request.onload = function() {
         var response = JSON.parse(request.response);
         if (request.status == 201) {
-            var brand = clickbusPayments.getCardBrand();
             var token = response.CreditCardTransactionResultCollection[0].CreditCard.InstantBuyKey;
-            clickPromise.finish(request.status, {id: token, name: this.name, brand: brand});
+            clickPromise.finish(request.status, {id: token, name: this.name});
+            return;
         }
 
         clickPromise.finish(request.status, {name: this.name, cause: response.ErrorReport});

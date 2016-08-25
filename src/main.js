@@ -187,6 +187,12 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
         }
     }
 
+    if (gatewayType == 'creditcard') {
+        this.successResponse.brand = this.getCardBrand();
+    }
+
+    this.successResponse['token'] = {};
+
     this.clickPromise = new ClickPromise(
         function() {
             var gateways = this.clickbusPayments.gateways;
