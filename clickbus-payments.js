@@ -79,6 +79,7 @@ ClickPromise.prototype.finish = function(status, response) {
  *  - `docTypeFieldId`          HTML field id for creditcard holder document type, default doc_type
  *  - `docNumberFieldId`        HTML field id for creditcard holder document number, default doc_number
  *  - `amountFieldId`           HTML field id for amount value, default amount
+ *  - `installmentFieldId`           HTML field id for install value, default installment
  *
  * @param {Object} options
  * @api public
@@ -108,7 +109,7 @@ function ClickBusPayments() {
 
     this.optionalValues = {
         amountFieldId: false,
-        publicKey: false
+        installmentFieldId: false
     };
 
     this.gateways = [];
@@ -194,6 +195,14 @@ ClickBusPayments.prototype.setDocNumberFieldId = function(docNumberFieldId) {
 ClickBusPayments.prototype.setAmountFieldId = function(amountFieldId) {
     this.options.amountFieldId = amountFieldId;
     this.personalizedOptions[0].amountFieldId = amountFieldId;
+    this.updateForm();
+    this.start();
+    return this;
+};
+
+ClickBusPayments.prototype.setInstallmentFieldId = function(installmentFieldId) {
+    this.options.installmentFieldId = installmentFieldId;
+    this.personalizedOptions[0].installmentFieldId = installmentFieldId;
     this.updateForm();
     this.start();
     return this;
@@ -295,6 +304,16 @@ ClickBusPayments.prototype.getAmount = function() {
     }
 
     return amount.value.replace(/[ .]/g, '');
+};
+
+ClickBusPayments.prototype.getInstallment = function() {
+    var installment = document.getElementById(this.options.installmentFieldId);
+
+    if (!installment) {
+        throw new Error('installmentFieldId is required');
+    }
+
+    return installment.value;
 };
 
 ClickBusPayments.prototype.getHolderName = function() {
@@ -480,7 +499,7 @@ MundiPagg.prototype.formatRequest = function(clickbusPayments) {
                     SecurityCode: clickbusPayments.getSecurityCode()
                 },
                 CreditCardOperation: "AuthOnly",
-                InstallmentCount: 1
+                InstallmentCount: clickbusPayments.getInstallment()
             }
         ]
     }

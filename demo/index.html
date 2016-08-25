@@ -53,6 +53,10 @@
                         <input type="text" id="ammount" value="150.00" />
                     </div>
                     <div>
+                        <label>Installment: </label>
+                        <input type="text" id="installment" value="1" />
+                    </div>
+                    <div>
                         <button>Submit!</button>
                     </div>
                 </form>
@@ -98,7 +102,8 @@
                     holderNameFieldId: 'holder_name',
                     docTypeFieldId: 'doc_type',
                     docNumberFieldId: 'doc_number',
-                    amountFieldId: 'ammount'
+                    amountFieldId: 'ammount',
+                    installmentFieldId: 'installment',
                 });
 
                 clickbus.subscribe(new MercadoPago('TEST-c24e58b1-a4e0-40f6-adb4-a6ca7cf60209'));
@@ -121,7 +126,7 @@
                         for(var key in response) {
                             var gateway = response[key];
                             document.getElementById('token').innerHTML += gateway.name + ' - ' + gateway.token + '<br>';
-                            document.getElementById('brand').innerHTML += gateway.name + ' - ' + gateway.brand + "<br>";
+                            document.getElementById('brand').innerHTML += gateway.name + ' - ' + gateway.card + "<br>";
                         }
                     }).fail(function(errors) {
                         console.log(errors);

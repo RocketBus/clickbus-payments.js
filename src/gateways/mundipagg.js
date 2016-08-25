@@ -48,7 +48,7 @@ MundiPagg.prototype.formatRequest = function(clickbusPayments) {
                     SecurityCode: clickbusPayments.getSecurityCode()
                 },
                 CreditCardOperation: "AuthOnly",
-                InstallmentCount: 1
+                InstallmentCount: clickbusPayments.getInstallment()
             }
         ]
     }
