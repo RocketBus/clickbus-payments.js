@@ -21,6 +21,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise) {
 
     Mercadopago.createToken(form, function(status, response) {
         response.name = this.name;
+        response.content = response.id;
         clickPromise.finish(status, response);
     }.bind(this));
 }

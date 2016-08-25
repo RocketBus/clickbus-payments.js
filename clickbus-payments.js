@@ -33,7 +33,7 @@ ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
             this.successPromises++;
-            this.clickbusPayments.successResponse['token'][response.name] = response.id;
+            this.clickbusPayments.successResponse['token'][response.name] = response.content;
         } else {
             this.errorPromises++;
             this.clickbusPayments.errorResponse[response.name] = response.cause;
@@ -439,6 +439,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise) {
 
     Mercadopago.createToken(form, function(status, response) {
         response.name = this.name;
+        response.content = response.id;
         clickPromise.finish(status, response);
     }.bind(this));
 }
@@ -459,7 +460,6 @@ MundiPagg.prototype.start = function() { }
 MundiPagg.prototype.clearSession = function() { }
 
 MundiPagg.prototype.createToken = function(form, clickPromise) {
-    var clickbusPayments = clickPromise.clickbusPayments;
     var request = new XMLHttpRequest();
     request.open('POST', 'https://sandbox.mundipaggone.com/Sale/');
     request.setRequestHeader('Content-Type', 'application/json');
@@ -469,7 +469,7 @@ MundiPagg.prototype.createToken = function(form, clickPromise) {
         var response = JSON.parse(request.response);
         if (request.status == 201) {
             var token = response.CreditCardTransactionResultCollection[0].CreditCard.InstantBuyKey;
-            clickPromise.finish(request.status, {id: token, name: this.name});
+            clickPromise.finish(request.status, {content: token, name: this.name});
             return;
         }
 
@@ -501,4 +501,37 @@ MundiPagg.prototype.formatRequest = function(clickbusPayments) {
             }
         ]
     }
+}
+
+"use strict";
+
+function Paypal(publicKey, isTest) {
+    this.type = 'paypal';
+    this.name = 'paypal';
+    this.publicKey = publicKey;
+}
+
+Paypal.prototype.start = function() { }
+Paypal.prototype.clearSession = function() { }
+
+Paypal.prototype.createToken = function(form, clickPromise) {
+    var response = {"token" : "EC-12312312312312","urlRedirect" : "https://www.sandbox.paypal.com/checkoutnow/?token=EC-123123123123123"};
+    clickPromise.finish(200, {content: response, name: this.name});
+    // var request = new XMLHttpRequest();
+    // request.open('GET', '/payment/token/paypal');
+    // request.onload = function() {
+    //     var response = JSON.parse(request.response);
+    //     if (request.status == 200) {
+    //         clickPromise.finish(request.status, {content: response, name: this.name});
+    //         return;
+    //     }
+    //
+    //     clickPromise.finish(request.status, {name: this.name, cause: response.ErrorReport});
+    // }.bind(this);
+
+    // request.onerror = function() {
+    //     console.log(request);
+    // };
+    //
+    // request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));
 }

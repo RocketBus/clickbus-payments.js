@@ -33,7 +33,7 @@ ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
             this.successPromises++;
-            this.clickbusPayments.successResponse['token'][response.name] = response.id;
+            this.clickbusPayments.successResponse['token'][response.name] = response.content;
         } else {
             this.errorPromises++;
             this.clickbusPayments.errorResponse[response.name] = response.cause;
