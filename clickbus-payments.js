@@ -32,14 +32,10 @@ ClickPromise.prototype.call = function() {
 ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
-
-            if (this.clickbusPayments.paymentMethodId === 'master') {
-                this.clickbusPayments.paymentMethodId = 'mastercard';
-            }
-
             var responseSuccessObject = {
                 name: response.name,
-                token: response.id
+                token: response.id,
+                brand: response.brand
             };
 
             this.successPromises++;
@@ -120,8 +116,6 @@ function ClickBusPayments() {
     this.personalizedOptions = arguments;
 
     this.clickPromise = [];
-
-    this.cardBrand = null;
 
     this.successResponse = {};
     this.errorResponse = {};
@@ -245,7 +239,6 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
         }
     }
 
-    this.successResponse.brand = this.getCardBrand();
     this.clickPromise = new ClickPromise(
         function() {
             var gateways = this.clickbusPayments.gateways;
@@ -428,6 +421,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise) {
 
     Mercadopago.createToken(form, function(status, response) {
         response.name = this.name;
+        response.brand = clickbusPayments.getCardBrand();
         clickPromise.finish(status, response);
     }.bind(this));
 }
@@ -448,24 +442,21 @@ MundiPagg.prototype.start = function() { }
 MundiPagg.prototype.clearSession = function() { }
 
 MundiPagg.prototype.createToken = function(form, clickPromise) {
+    var clickbusPayments = clickPromise.clickbusPayments;
     var request = new XMLHttpRequest();
     request.open('POST', 'https://sandbox.mundipaggone.com/Sale/');
     request.setRequestHeader('Content-Type', 'application/json');
     request.setRequestHeader('Accept', 'application/json');
     request.setRequestHeader('MerchantKey', this.publicKey);
     request.onload = function() {
-        var token = null;
         var response = JSON.parse(request.response);
         if (request.status == 201) {
-            token = response.CreditCardTransactionResultCollection[0].CreditCard.InstantBuyKey;
-            clickPromise.finish(request.status, {id: token, name: this.name});
+            var brand = clickbusPayments.getCardBrand();
+            var token = response.CreditCardTransactionResultCollection[0].CreditCard.InstantBuyKey;
+            clickPromise.finish(request.status, {id: token, name: this.name, brand: brand});
         }
 
-        clickPromise.finish(request.status, {
-            id: token,
-            name: this.name,
-            cause: response.ErrorReport
-        });
+        clickPromise.finish(request.status, {name: this.name, cause: response.ErrorReport});
     }.bind(this);
 
     request.onerror = function() {

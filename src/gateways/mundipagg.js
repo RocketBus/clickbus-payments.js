@@ -10,24 +10,21 @@ MundiPagg.prototype.start = function() { }
 MundiPagg.prototype.clearSession = function() { }
 
 MundiPagg.prototype.createToken = function(form, clickPromise) {
+    var clickbusPayments = clickPromise.clickbusPayments;
     var request = new XMLHttpRequest();
     request.open('POST', 'https://sandbox.mundipaggone.com/Sale/');
     request.setRequestHeader('Content-Type', 'application/json');
     request.setRequestHeader('Accept', 'application/json');
     request.setRequestHeader('MerchantKey', this.publicKey);
     request.onload = function() {
-        var token = null;
         var response = JSON.parse(request.response);
         if (request.status == 201) {
-            token = response.CreditCardTransactionResultCollection[0].CreditCard.InstantBuyKey;
-            clickPromise.finish(request.status, {id: token, name: this.name});
+            var brand = clickbusPayments.getCardBrand();
+            var token = response.CreditCardTransactionResultCollection[0].CreditCard.InstantBuyKey;
+            clickPromise.finish(request.status, {id: token, name: this.name, brand: brand});
         }
 
-        clickPromise.finish(request.status, {
-            id: token,
-            name: this.name,
-            cause: response.ErrorReport
-        });
+        clickPromise.finish(request.status, {name: this.name, cause: response.ErrorReport});
     }.bind(this);
 
     request.onerror = function() {

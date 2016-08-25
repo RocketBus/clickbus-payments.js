@@ -32,14 +32,10 @@ ClickPromise.prototype.call = function() {
 ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
-
-            if (this.clickbusPayments.paymentMethodId === 'master') {
-                this.clickbusPayments.paymentMethodId = 'mastercard';
-            }
-
             var responseSuccessObject = {
                 name: response.name,
-                token: response.id
+                token: response.id,
+                brand: response.brand
             };
 
             this.successPromises++;

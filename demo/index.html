@@ -121,7 +121,7 @@
                         for(var key in response) {
                             var gateway = response[key];
                             document.getElementById('token').innerHTML += gateway.name + ' - ' + gateway.token + '<br>';
-                            document.getElementById('brand').innerHTML += gateway.name + ' - ' + gateway.payment_method + "<br>";
+                            document.getElementById('brand').innerHTML += gateway.name + ' - ' + gateway.brand + "<br>";
                         }
                     }).fail(function(errors) {
                         console.log(errors);

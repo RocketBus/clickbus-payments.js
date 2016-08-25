@@ -56,8 +56,6 @@ function ClickBusPayments() {
 
     this.clickPromise = [];
 
-    this.cardBrand = null;
-
     this.successResponse = {};
     this.errorResponse = {};
 
@@ -179,8 +177,6 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
             elements[i].value = documentNumber.replace(/[^0-9]+/g, '');
         }
     }
-
-    this.successResponse.brand = this.getCardBrand();
 
     this.clickPromise = new ClickPromise(
         function() {
