@@ -9,7 +9,7 @@ function ClickPromise(callable, clickbusPayments) {
 
     this.errorPromises = 0;
     this.successPromises = 0;
-    this.totalPromises = clickbusPayments.gateways.length;
+    this.totalPromises = 0;
 
     this.callbackSuccess = function() {};
     this.callbackFail = function() {};

@@ -52,6 +52,7 @@ function ClickBusPayments() {
     };
 
     this.gateways = [];
+    this.gatewayType = null;
 
     this.personalizedOptions = arguments;
 
@@ -192,11 +193,14 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
         this.successResponse.brand = this.getCardBrand();
     }
 
+    this.gatewayType = gatewayType;
+
     this.clickPromise = new ClickPromise(
         function() {
             var gateways = this.clickbusPayments.gateways;
             gateways.forEach(function(gateway) {
                 if (gateway.type == gatewayType) {
+                    this.totalPromises++;
                     gateway.createToken(form, this);
                 }
             }, this);
