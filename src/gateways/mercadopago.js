@@ -11,7 +11,7 @@ MercadoPago.prototype.start = function() {
     loadScript(this.gatewayUrl, function() {
         Mercadopago.setPublishableKey(this.publicKey);
     }.bind(this));
-}
+};
 
 MercadoPago.prototype.createToken = function(form, clickPromise) {
     var token = clickPromise.clickbusPayments.successResponse.token;
@@ -24,8 +24,8 @@ MercadoPago.prototype.createToken = function(form, clickPromise) {
         response.content = response.id;
         clickPromise.finish(status, response);
     }.bind(this));
-}
+};
 
 MercadoPago.prototype.clearSession = function() {
     Mercadopago.clearSession();
-}
+};

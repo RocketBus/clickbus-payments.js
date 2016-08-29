@@ -6,8 +6,8 @@ function MundiPagg(publicKey, isTest) {
     this.publicKey = publicKey;
 }
 
-MundiPagg.prototype.start = function() { }
-MundiPagg.prototype.clearSession = function() { }
+MundiPagg.prototype.start = function() { };
+MundiPagg.prototype.clearSession = function() { };
 
 MundiPagg.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
@@ -31,7 +31,7 @@ MundiPagg.prototype.createToken = function(form, clickPromise) {
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));
-}
+};
 
 MundiPagg.prototype.formatRequest = function(clickbusPayments) {
     return {
@@ -51,4 +51,4 @@ MundiPagg.prototype.formatRequest = function(clickbusPayments) {
             }
         ]
     }
-}
+};

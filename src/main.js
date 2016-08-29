@@ -67,7 +67,7 @@ function ClickBusPayments() {
 ClickBusPayments.prototype.init = function() {
     this.start();
     this.successResponse['token'] = {};
-}
+};
 
 ClickBusPayments.prototype.setPaymentFormId = function(paymentFormId) {
     this.options.paymentFormId = paymentFormId;
@@ -242,7 +242,7 @@ ClickBusPayments.prototype.getCardBrand = function() {
     }
 
     return null;
-}
+};
 
 ClickBusPayments.prototype.getAmount = function() {
     var amount = document.getElementById(this.options.amountFieldId);

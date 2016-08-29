@@ -6,8 +6,8 @@ function Paypal(publicKey, isTest) {
     this.publicKey = publicKey;
 }
 
-Paypal.prototype.start = function() { }
-Paypal.prototype.clearSession = function() { }
+Paypal.prototype.start = function() { };
+Paypal.prototype.clearSession = function() { };
 
 Paypal.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
@@ -27,4 +27,4 @@ Paypal.prototype.createToken = function(form, clickPromise) {
     };
 
     request.send();
-}
+};
