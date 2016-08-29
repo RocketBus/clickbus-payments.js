@@ -122,7 +122,7 @@ function ClickBusPayments() {
 ClickBusPayments.prototype.init = function() {
     this.start();
     this.successResponse['token'] = {};
-}
+};
 
 ClickBusPayments.prototype.setPaymentFormId = function(paymentFormId) {
     this.options.paymentFormId = paymentFormId;
@@ -297,7 +297,7 @@ ClickBusPayments.prototype.getCardBrand = function() {
     }
 
     return null;
-}
+};
 
 ClickBusPayments.prototype.getAmount = function() {
     var amount = document.getElementById(this.options.amountFieldId);
@@ -433,7 +433,7 @@ MercadoPago.prototype.start = function() {
     loadScript(this.gatewayUrl, function() {
         Mercadopago.setPublishableKey(this.publicKey);
     }.bind(this));
-}
+};
 
 MercadoPago.prototype.createToken = function(form, clickPromise) {
     var token = clickPromise.clickbusPayments.successResponse.token;
@@ -446,11 +446,11 @@ MercadoPago.prototype.createToken = function(form, clickPromise) {
         response.content = response.id;
         clickPromise.finish(status, response);
     }.bind(this));
-}
+};
 
 MercadoPago.prototype.clearSession = function() {
     Mercadopago.clearSession();
-}
+};
 
 "use strict";
 
@@ -460,8 +460,8 @@ function MundiPagg(publicKey, isTest) {
     this.publicKey = publicKey;
 }
 
-MundiPagg.prototype.start = function() { }
-MundiPagg.prototype.clearSession = function() { }
+MundiPagg.prototype.start = function() { };
+MundiPagg.prototype.clearSession = function() { };
 
 MundiPagg.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
@@ -485,7 +485,7 @@ MundiPagg.prototype.createToken = function(form, clickPromise) {
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));
-}
+};
 
 MundiPagg.prototype.formatRequest = function(clickbusPayments) {
     return {
@@ -505,7 +505,7 @@ MundiPagg.prototype.formatRequest = function(clickbusPayments) {
             }
         ]
     }
-}
+};
 
 "use strict";
 
@@ -515,8 +515,8 @@ function Paypal(publicKey, isTest) {
     this.publicKey = publicKey;
 }
 
-Paypal.prototype.start = function() { }
-Paypal.prototype.clearSession = function() { }
+Paypal.prototype.start = function() { };
+Paypal.prototype.clearSession = function() { };
 
 Paypal.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
@@ -536,4 +536,4 @@ Paypal.prototype.createToken = function(form, clickPromise) {
     };
 
     request.send();
-}
+};
