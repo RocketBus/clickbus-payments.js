@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>DEMO</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body { font-family: 'Arial'; background: #f9f9f9; }
+            div, form { padding: 10px; }
+            form div { height: 40px; }
+            button { width: 200px; height: 30px; }
+            input { width: 200px; height: 25px; font-size: 14px; }
+            label { font-weight: bold; }
+            .result { height: 60px; width: 290px; border: 1px solid #000; font-style: italic; font-size: 12px; }
+            section { float: left; width: 300px; background: #fff; margin-right: 10px; }
+            .demo { width: 350px; }
+        </style>
+    </head>
+    <body>
+        <div>
+            <section>
+                <form action="" method="POST" id="payment_form" onsubmit="submitForm(event)">
+                    <div>
+                        <label>Credit Card: </label>
+                        <input type="text" id="credit_card" value="1234-5678-8765-4321" />
+                    </div>
+                    <div>
+                        <label>Security Code: </label>
+                        <input type="text" id="security_code_other_id" value="123" />
+                    </div>
+                    <div>
+                        <label>Expiration Month: </label>
+                        <input type="text" id="expiration_month" value="10" />
+                    </div>
+                    <div>
+                        <label>Expiration Year: </label>
+                        <input type="text" id="expiration_year" value="2017" />
+                    </div>
+                    <div>
+                        <label>Holder Name: </label>
+                        <input type="text" id="holder_name" value="John Doe" />
+                    </div>
+                    <div>
+                        <label>Document Type: </label>
+                        <input type="text" id="doc_type" value="CPF" />
+                    </div>
+                    <div>
+                        <label>Document Number: </label>
+                        <input type="text" id="doc_number" value="68432081426" />
+                    </div>
+                    <div>
+                        <label>Ammount: </label>
+                        <input type="text" id="ammount" value="150.00" />
+                    </div>
+                    <div>
+                        <label>Installment: </label>
+                        <input type="text" id="installment" value="1" />
+                    </div>
+                    <div>
+                        <button>Submit!</button>
+                    </div>
+                </form>
+            </section>
+            <section class="demo">
+                <div>
+                    <div>
+                        <h4>TOKEN</h4>
+                        <div id="token" class="result"></div>
+                    </div>
+                    <div>
+                        <h4>PAYMENT METHOD</h4>
+                        <div id="brand" class="result"></div>
+                    </div>
+                </div>
+            </section>
+            <section class="demo">
+                <div>
+                    <div>
+                        <h4>ERROR CODE</h4>
+                        <div id="code" class="result"></div>
+                    </div>
+                    <div>
+                        <h4>ERROR MESSAGE</h4>
+                        <div id="message" class="result"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <script src="../clickbus-payments.js"></script>
+        <script>
+            var clickbus = null;
+
+            // Here you can find a list of mapped fields for each parameter.
+            window.onload = function() {
+                clickbus = new ClickBusPayments({
+                    paymentFormId: 'payment_form',
+                    creditcardFieldId: 'credit_card',
+                    securityCodeFieldId: 'security_code_other_id',
+                    expirationMonthFieldId: 'expiration_month',
+                    expirationYearFieldId: 'expiration_year',
+                    holderNameFieldId: 'holder_name',
+                    docTypeFieldId: 'doc_type',
+                    docNumberFieldId: 'doc_number',
+                    amountFieldId: 'ammount',
+                    installmentFieldId: 'installment',
+                });
+
+                clickbus.subscribe(new MercadoPago('TEST-c24e58b1-a4e0-40f6-adb4-a6ca7cf60209'));
+                clickbus.subscribe(new MundiPagg('7ac3cf57-7163-446f-aa92-812369516d08'));
+                clickbus.subscribe(new Paypal());
+                clickbus.init();
+            };
+
+            // Then, adding am event to generate the token.
+            function submitForm(event) {
+                event.preventDefault();
+
+                document.getElementById('token').innerHTML = '';
+                document.getElementById('brand').innerHTML =  '';
+                document.getElementById('code').innerHTML =  '';
+                document.getElementById('message').innerHTML =  '';
+
+                clickbus.generateToken('paypal').success(function(response) {
+                        console.log(response);
+
+                        for(var key in response.token) {
+                            var gateway = response.token[key];
+                            document.getElementById('token').innerHTML += key + ' - ' + gateway + '<br>';
+                            document.getElementById('brand').innerHTML += key + ' - ' + response.brand + "<br>";
+                        }
+                    }).fail(function(errors) {
+                        console.log(errors);
+                        // for (var error in errors) {
+                        //     document.getElementById('code').innerHTML = errors[error].code + '<br>';
+                        //     document.getElementById('message').innerHTML = errors[error].description + '<br>';
+                        // }
+                }).call();
+
+                return false;
+            }
+        </script>
+
+    </body>
+</html>

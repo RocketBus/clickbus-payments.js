@@ -98,3 +98,29 @@ It's the library to be implemented for Clickbus' clients who are integrating wit
 </body>
 </html>
 ```
+
+## What if I have my own MercadoPago Public Key?
+
+Please provide your public key, like below:
+
+```javascript
+window.onload = function() {
+    clickbus = new ClickBusPayments({
+        paymentFormId: 'payment_form',
+        creditcardFieldId: 'credit_card',
+        securityCodeFieldId: 'security_code_other_id',
+        expirationMonthFieldId: 'expiration_month',
+        expirationYearFieldId: 'expiration_year',
+        holderNameFieldId: 'holder_name',
+        docTypeFieldId: 'doc_type',
+        docNumberFieldId: 'doc_number',
+        test: true, // or false, you decide :)
+        publicKey: {
+            test: "TEST-POTATOESAREAWESOMEWITHCHEESEONIONSANDGARLIC",
+            live: "APP_USR-YOUCANSMASHBAKEEVENRAWTHEYAREDELICIOUS"
+        }
+    });
+};
+```
+
+Remember that this is optional. If you don't provide the `publicKey` object then this library will use the default keys :wink:.

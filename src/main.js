@@ -18,6 +18,7 @@
  *  - `docTypeFieldId`          HTML field id for creditcard holder document type, default doc_type
  *  - `docNumberFieldId`        HTML field id for creditcard holder document number, default doc_number
  *  - `amountFieldId`           HTML field id for amount value, default amount
+ *  - `installmentFieldId`           HTML field id for install value, default installment
  *
  * @param {Object} options
  * @api public
@@ -45,25 +46,28 @@ function ClickBusPayments() {
         docNumberFieldId: "docNumber"
     };
 
-    this.optionalValues = { test: false, amountFieldId: false, useDynamicInstallments: false };
+    this.optionalValues = {
+        amountFieldId: false,
+        installmentFieldId: false
+    };
+
+    this.gateways = [];
+    this.gatewayType = null;
 
     this.personalizedOptions = arguments;
 
-    this.loaded = false;
+    this.clickPromise = [];
 
-    this.clickPromise = null;
-
-    this.installments = [1];
-    this.paymentMethodId = null;
-
-    this.token = null;
-
-    this.test = (typeof this.personalizedOptions[0].test !== 'undefined') ? this.personalizedOptions[0].test : false;
-    this.useDynamicInstallments = (typeof this.personalizedOptions[0].useDynamicInstallments !== 'undefined') ? this.personalizedOptions[0].useDynamicInstallments : false;
+    this.successResponse = {};
+    this.errorResponse = {};
 
     this.updateForm();
-    loadScript(config.javascript_url, function() { return this.start() }.bind(this));
 }
+
+ClickBusPayments.prototype.init = function() {
+    this.start();
+    this.successResponse['token'] = {};
+};
 
 ClickBusPayments.prototype.setPaymentFormId = function(paymentFormId) {
     this.options.paymentFormId = paymentFormId;
@@ -137,31 +141,22 @@ ClickBusPayments.prototype.setAmountFieldId = function(amountFieldId) {
     return this;
 };
 
-ClickBusPayments.prototype.start = function() {
-    var public_key = (this.test == true) ? config.public_key.test : config.public_key.live;
-    Mercadopago.setPublishableKey(public_key);
-    this.loaded = true;
+ClickBusPayments.prototype.setInstallmentFieldId = function(installmentFieldId) {
+    this.options.installmentFieldId = installmentFieldId;
+    this.personalizedOptions[0].installmentFieldId = installmentFieldId;
+    this.updateForm();
+    this.start();
+    return this;
+};
 
-    addEvent(
-        document.querySelector('input[data-checkout="cardNumber"]'),
-        'keyup',
-        function(event) {
-            this.guessingPaymentMethod(event, this);
-            if (this.useDynamicInstallments !== false) {
-                this.getInstallments(this);
-            }
-        }.bind(this)
-    );
-    addEvent(
-        document.querySelector('input[data-checkout="cardNumber"]'),
-        'change',
-        function(event) {
-            this.guessingPaymentMethod(event, this);
-            if (this.useDynamicInstallments !== false) {
-                this.getInstallments(this);
-            }
-        }.bind(this)
-    );
+ClickBusPayments.prototype.subscribe = function(gateway) {
+    this.gateways.push(gateway);
+};
+
+ClickBusPayments.prototype.start = function() {
+    this.gateways.forEach(function(gateway) {
+        gateway['start']();
+    });
 };
 
 ClickBusPayments.prototype.updateForm = function() {
@@ -183,7 +178,7 @@ ClickBusPayments.prototype.updateForm = function() {
     }
 };
 
-ClickBusPayments.prototype.generateToken = function() {
+ClickBusPayments.prototype.generateToken = function(gatewayType) {
     var form = document.getElementById(this.options['paymentFormId']);
 
     var elements = form.getElementsByTagName('input');
@@ -194,14 +189,21 @@ ClickBusPayments.prototype.generateToken = function() {
         }
     }
 
-    if (this.token != null) {
-        console.log('[DEBUG] - Clearing token: ' + this.token);
-        Mercadopago.clearSession();
+    if (gatewayType == 'credit_card') {
+        this.successResponse.brand = this.getCardBrand();
     }
+
+    this.gatewayType = gatewayType;
 
     this.clickPromise = new ClickPromise(
         function() {
-            Mercadopago.createToken(form, function(status, response) { return this.finish(status, response) }.bind(this));
+            var gateways = this.clickbusPayments.gateways;
+            gateways.forEach(function(gateway) {
+                if (gateway.type == gatewayType) {
+                    this.totalPromises++;
+                    gateway.createToken(form, this);
+                }
+            }, this);
         },
         this
     );
@@ -209,74 +211,105 @@ ClickBusPayments.prototype.generateToken = function() {
     return this.clickPromise;
 };
 
-ClickBusPayments.prototype.getBin = function() {
-    var ccNumber = document.querySelector('input[data-checkout="cardNumber"]');
-
-    if (!ccNumber) {
-        throw new Error('creditcardFieldId is required');
-    }
-
-    return ccNumber.value.replace(/[ .-]/g, '').slice(0, 6);
-};
-
-ClickBusPayments.prototype.setPaymentMethodInfo = function(status, response, object) {
-    if (status == 200) {
-        object.paymentMethodId = response[0].id;
-    }
-};
-
-ClickBusPayments.prototype.guessingPaymentMethod = function(event, object) {
-    var bin = this.getBin();
-
-    if (event.type == "keyup") {
-        if (bin.length >= 6) {
-            Mercadopago.getPaymentMethod({
-                "bin": bin
-            }, function(status, response) { object.setPaymentMethodInfo(status, response, object) }.bind(object));
+ClickBusPayments.prototype.getCardBrand = function() {
+    var brands = [{
+            name: 'visa',
+            pattern: /^4/
+        }, {
+            name: 'mastercard',
+            pattern: /^5[1-5][0-9][0-9]/
+        }, {
+            name: 'amex',
+            pattern: /^3[47]/
+        }, {
+            name: 'diners',
+            pattern: /^3(?:0[0-5]|[68][0-9])/
+        }, {
+            name: 'elo',
+            pattern: /^401178|^401179|^431274|^438935|^451416|^457393|^457631|^457632|^504175|^627780|^636297|^636368|^(506699|5067[0-6]\d|50677[0-8])|^(50900\d|5090[1-9]\d|509[1-9]\d{2})|^65003[1-3]|^(65003[5-9]|65004\d|65005[0-1])|^(65040[5-9]|6504[1-3]\d)|^(65048[5-9]|65049\d|6505[0-2]\d|65053     [0-8])|^(65054[1-9]|6505[5-8]\d|65059[0-8])|^(65070\d|65071[0-8])|^65072[0-7]|^(65090[1-9]|65091\d|650920)|^(65165[2-9]|6516[6-7]\d)|^(65500\d|65501\d)|^(65502[1-9]|6550[3-4]\d|65505[0-8])/
+        },{
+            name: 'hipercard',
+            pattern: /^3841[046]0|^60/
         }
-    } else {
-        setTimeout(function() {
-            if (bin.length >= 6) {
-                Mercadopago.getPaymentMethod({
-                    "bin": bin
-                }, function(status, response) { object.setPaymentMethodInfo(status, response, object) }.bind(object));
-            }
-        }, 100);
+    ];
+
+    var ccNumber = this.getCreditCard();
+    for(var key in brands) {
+        var brand = brands[key];
+        if (ccNumber.match(brand.pattern)) {
+            return brand.name;
+        }
     }
+
+    return null;
 };
 
 ClickBusPayments.prototype.getAmount = function() {
     var amount = document.getElementById(this.options.amountFieldId);
 
     if (!amount) {
-        throw new Error('amountFieldId is required to get installments');
+        throw new Error('amountFieldId is required');
     }
 
-    return amount.value;
+    return amount.value.replace(/[ .]/g, '');
 };
 
-ClickBusPayments.prototype.getInstallments = function(object) {
-    var bin = this.getBin(),
-        amount = this.getAmount();
+ClickBusPayments.prototype.getInstallment = function() {
+    var installment = document.getElementById(this.options.installmentFieldId);
 
-    if (bin.length >= 6) {
-        Mercadopago.getInstallments({
-            "bin": bin,
-            "amount": amount
-        }, function (status, response) {
-            object.setInstallmentsInfo(status, response, object)
-        }.bind(object));
+    if (!installment) {
+        throw new Error('installmentFieldId is required');
     }
+
+    return installment.value;
 };
 
-ClickBusPayments.prototype.setInstallmentsInfo = function(status, response, object) {
-    if (response.length > 0) {
-        var payerCosts = response[0].payer_costs;
-        if(payerCosts.length > 0){
-            object.installments = [];
-        }
-        for (var i=0; i < payerCosts.length; i++) {
-            object.installments.push(payerCosts[i].installments);
-        }
+ClickBusPayments.prototype.getHolderName = function() {
+    var holderName = document.getElementById(this.options.holderNameFieldId);
+
+    if (!holderName) {
+        throw new Error('holderNameFieldId is required');
     }
+
+    return holderName.value;
+};
+
+ClickBusPayments.prototype.getCreditCard = function() {
+    var ccNumber = document.getElementById(this.options.creditcardFieldId);
+
+    if (!ccNumber) {
+        throw new Error('creditcardFieldId is required');
+    }
+
+    return ccNumber.value.replace(/[ .-]/g, '');
+};
+
+ClickBusPayments.prototype.getExpirationMonth = function() {
+    var expirationMonth = document.getElementById(this.options.expirationMonthFieldId);
+
+    if (!expirationMonth) {
+        throw new Error('expirationMonthFieldId is required');
+    }
+
+    return expirationMonth.value;
+};
+
+ClickBusPayments.prototype.getExpirationYear = function() {
+    var expirationYear = document.getElementById(this.options.expirationYearFieldId);
+
+    if (!expirationYear) {
+        throw new Error('expirationYearFieldId is required');
+    }
+
+    return expirationYear.value;
+};
+
+ClickBusPayments.prototype.getSecurityCode = function() {
+    var securityCode = document.getElementById(this.options.securityCodeFieldId);
+
+    if (!securityCode) {
+        throw new Error('securityCodeFieldId is required');
+    }
+
+    return securityCode.value;
 };
