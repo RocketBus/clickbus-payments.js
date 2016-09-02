@@ -424,7 +424,7 @@ function merge(primary, secundary) {
 
 function MercadoPago(publicKey) {
     this.type = 'credit_card'
-    this.name = 'mercadopago';
+    this.name = 'mercadoPago';
     this.publicKey = publicKey;
     this.gatewayUrl = "https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js?nocache=" + Math.random() * 10;
 }
