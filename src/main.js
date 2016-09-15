@@ -181,14 +181,6 @@ ClickBusPayments.prototype.updateForm = function() {
 ClickBusPayments.prototype.generateToken = function(gatewayType) {
     var form = document.getElementById(this.options['paymentFormId']);
 
-    var elements = form.getElementsByTagName('input');
-    for (var i = 0; i < elements.length; i++) {
-        if (elements[i].id == this.options.docNumberFieldId) {
-            var documentNumber = elements[i].value;
-            elements[i].value = documentNumber.replace(/[^0-9]+/g, '');
-        }
-    }
-
     if (gatewayType == 'credit_card') {
         this.successResponse.brand = this.getCardBrand();
     }
