@@ -22,39 +22,39 @@
                 <form action="" method="POST" id="payment_form" onsubmit="submitForm(event)">
                     <div>
                         <label>Credit Card: </label>
-                        <input type="text" id="credit_card" value="1234-5678-8765-4321" />
+                        <input type="text" class="credit_card" data-checkout="cardNumber"  value="1234-5678-8765-4321" />
                     </div>
                     <div>
                         <label>Security Code: </label>
-                        <input type="text" id="security_code_other_id" value="123" />
+                        <input type="text" class="security_code_other_class" data-checkout="securityCode" value="123" />
                     </div>
                     <div>
                         <label>Expiration Month: </label>
-                        <input type="text" id="expiration_month" value="10" />
+                        <input type="text" class="expiration_month" data-checkout="cardExpirationMonth" value="10" />
                     </div>
                     <div>
                         <label>Expiration Year: </label>
-                        <input type="text" id="expiration_year" value="2017" />
+                        <input type="text" class="expiration_year" data-checkout="cardExpirationYear" value="2017" />
                     </div>
                     <div>
                         <label>Holder Name: </label>
-                        <input type="text" id="holder_name" value="John Doe" />
+                        <input type="text" class="holder_name" value="John Doe" data-checkout="cardholderName" />
                     </div>
                     <div>
                         <label>Document Type: </label>
-                        <input type="text" id="doc_type" value="CPF" />
+                        <input type="text" class="doc_type" data-checkout="docType" value="CPF" />
                     </div>
                     <div>
                         <label>Document Number: </label>
-                        <input type="text" id="doc_number" value="68432081426" />
+                        <input type="text" class="doc_number" value="68432081426" />
                     </div>
                     <div>
                         <label>Ammount: </label>
-                        <input type="text" id="ammount" value="150.00" />
+                        <input type="text" class="ammount" value="150.00" />
                     </div>
                     <div>
                         <label>Installment: </label>
-                        <input type="text" id="installment" value="1" />
+                        <input type="text" class="installment" value="1" />
                     </div>
                     <div>
                         <button>Submit!</button>
@@ -95,20 +95,18 @@
             window.onload = function() {
                 clickbus = new ClickBusPayments({
                     paymentFormId: 'payment_form',
-                    creditcardFieldId: 'credit_card',
-                    securityCodeFieldId: 'security_code_other_id',
-                    expirationMonthFieldId: 'expiration_month',
-                    expirationYearFieldId: 'expiration_year',
-                    holderNameFieldId: 'holder_name',
-                    docTypeFieldId: 'doc_type',
-                    docNumberFieldId: 'doc_number',
-                    amountFieldId: 'ammount',
-                    installmentFieldId: 'installment',
+                    creditcardFieldClass: 'credit_card',
+                    securityCodeFieldClass: 'security_code_other_id',
+                    expirationMonthFieldClass: 'expiration_month',
+                    expirationYearFieldClass: 'expiration_year',
+                    holderNameFieldClass: 'holder_name',
+                    docTypeFieldClass: 'doc_type',
+                    docNumberFieldClass: 'doc_number',
+                    amountFieldClass: 'ammount',
+                    installmentFieldClass: 'installment',
                 });
 
                 clickbus.subscribe(new MercadoPago('TEST-c24e58b1-a4e0-40f6-adb4-a6ca7cf60209'));
-                clickbus.subscribe(new MundiPagg('7ac3cf57-7163-446f-aa92-812369516d08'));
-                clickbus.subscribe(new Paypal());
                 clickbus.init();
             };
 
@@ -121,7 +119,7 @@
                 document.getElementById('code').innerHTML =  '';
                 document.getElementById('message').innerHTML =  '';
 
-                clickbus.generateToken('paypal').success(function(response) {
+                clickbus.generateToken('credit_card').success(function(response) {
                         console.log(response);
 
                         for(var key in response.token) {
