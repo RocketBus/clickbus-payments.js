@@ -477,21 +477,13 @@ MundiPagg.prototype.createToken = function(form, clickPromise) {
 
 MundiPagg.prototype.formatRequest = function(clickbusPayments) {
     return {
-        CreditCardTransactionCollection: [
-            {
-                AmountInCents: clickbusPayments.getAmount(),
-                CreditCard: {
-                    CreditCardBrand: clickbusPayments.getCardBrand(),
-                    CreditCardNumber: clickbusPayments.getCreditCard(),
-                    ExpMonth: clickbusPayments.getExpirationMonth(),
-                    ExpYear: clickbusPayments.getExpirationYear(),
-                    HolderName: clickbusPayments.getHolderName(),
-                    SecurityCode: clickbusPayments.getSecurityCode()
-                },
-                CreditCardOperation: "AuthOnly",
-                InstallmentCount: clickbusPayments.getInstallment()
-            }
-        ]
+        CreditCardBrand: clickbusPayments.getCardBrand(),
+        CreditCardNumber: clickbusPayments.getCreditCard(),
+        ExpMonth: clickbusPayments.getExpirationMonth(),
+        ExpYear: clickbusPayments.getExpirationYear(),
+        HolderName: clickbusPayments.getHolderName(),
+        SecurityCode: clickbusPayments.getSecurityCode(),
+        IsOneDollarAuthEnabled: false
     }
 };
 
