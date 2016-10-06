@@ -33,7 +33,17 @@ ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
             this.successPromises++;
-            this.clickbusPayments.successResponse['token'][response.name] = response.content;
+
+            if (!this.clickbusPayments.successResponse.hasOwnProperty(response.type)) {
+                this.clickbusPayments.successResponse[response.type] = {};
+                this.clickbusPayments.successResponse[response.type]['token'] = {};
+            }
+
+            if (response.type == 'credit_card' || response.type == 'debit_card') {
+                this.clickbusPayments.successResponse[response.type]['brand'] = this.clickbusPayments.getCardBrand();
+            }
+
+            this.clickbusPayments.successResponse[response.type]['token'][response.name] = response.content;
         } else {
             this.errorPromises++;
             this.clickbusPayments.errorResponse[response.name] = response.cause;
@@ -48,7 +58,7 @@ ClickPromise.prototype.finish = function(status, response) {
         }
 
         if ((this.successPromises + this.errorPromises) == this.totalPromises) {
-            this.callbackSuccess(this.clickbusPayments.successResponse);
+            this.callbackSuccess(this.clickbusPayments.successResponse[response.type]);
         }
     }
 };

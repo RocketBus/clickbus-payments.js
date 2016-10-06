@@ -14,7 +14,7 @@ PayZen.prototype.createToken = function(form, clickPromise) {
     request.onload = function() {
         var response = JSON.parse(request.response);
         if (request.status == 200) {
-            clickPromise.finish(request.status, {content: response, name: this.name});
+            clickPromise.finish(request.status, {content: response, type: this.type, name: this.name});
             return;
         }
 

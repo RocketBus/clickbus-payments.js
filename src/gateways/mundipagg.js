@@ -15,7 +15,7 @@ MundiPagg.prototype.createToken = function(form, clickPromise) {
     request.onload = function() {
         var response = JSON.parse(request.response);
         if (request.status == 201) {
-            clickPromise.finish(request.status, {content: response.token, name: this.name});
+            clickPromise.finish(request.status, {content: response.token, type: this.type, name: this.name});
             return;
         }
 

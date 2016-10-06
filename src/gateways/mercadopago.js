@@ -14,13 +14,14 @@ MercadoPago.prototype.start = function() {
 };
 
 MercadoPago.prototype.createToken = function(form, clickPromise) {
-    var token = clickPromise.clickbusPayments.successResponse.token;
-    if (token.hasOwnProperty(this.name)) {
+    var successResponse = clickPromise.clickbusPayments.successResponse;
+    if (successResponse.hasOwnProperty(this.type)) {
         this.clearSession();
     }
 
     Mercadopago.createToken(form, function(status, response) {
         response.name = this.name;
+        response.type = this.type;
         response.content = response.id;
         clickPromise.finish(status, response);
     }.bind(this));

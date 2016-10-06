@@ -42,7 +42,6 @@ function ClickBusPayments() {
     };
 
     this.gateways = [];
-    this.gatewayType = null;
 
     this.personalizedOptions = arguments;
 
@@ -56,7 +55,6 @@ function ClickBusPayments() {
 
 ClickBusPayments.prototype.init = function() {
     this.start();
-    this.successResponse['token'] = {};
 };
 
 ClickBusPayments.prototype.setPaymentFormId = function(paymentFormId) {
@@ -167,12 +165,6 @@ ClickBusPayments.prototype.updateForm = function() {
 ClickBusPayments.prototype.generateToken = function(gatewayType) {
     var form = document.getElementById(this.options['paymentFormId']);
 
-    this.clearResponses();
-
-    if (gatewayType == 'credit_card' || gatewayType == 'debit_card') {
-        this.successResponse.brand = this.getCardBrand();
-    }
-
     this.clickPromise = new ClickPromise(
         function() {
             var gateways = this.clickbusPayments.gateways;
@@ -189,12 +181,6 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
     return this.clickPromise;
 };
 
-ClickBusPayments.prototype.clearResponses = function() {
-    this.successResponse = {};
-    this.successResponse['token'] = {};
-
-    this.errorResponse = {};
-};
 ClickBusPayments.prototype.getElement = function(className) {
     var elements = document.getElementsByClassName(className);
 
