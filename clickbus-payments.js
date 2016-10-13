@@ -33,7 +33,17 @@ ClickPromise.prototype.finish = function(status, response) {
     try {
         if (status == 201 || status == 200) {
             this.successPromises++;
-            this.clickbusPayments.successResponse['token'][response.name] = response.content;
+
+            if (!this.clickbusPayments.successResponse.hasOwnProperty(response.type)) {
+                this.clickbusPayments.successResponse[response.type] = {};
+                this.clickbusPayments.successResponse[response.type]['token'] = {};
+            }
+
+            if (response.type == 'credit_card' || response.type == 'debit_card') {
+                this.clickbusPayments.successResponse[response.type]['brand'] = this.clickbusPayments.getCardBrand();
+            }
+
+            this.clickbusPayments.successResponse[response.type]['token'][response.name] = response.content;
         } else {
             this.errorPromises++;
             this.clickbusPayments.errorResponse[response.name] = response.cause;
@@ -48,7 +58,7 @@ ClickPromise.prototype.finish = function(status, response) {
         }
 
         if ((this.successPromises + this.errorPromises) == this.totalPromises) {
-            this.callbackSuccess(this.clickbusPayments.successResponse);
+            this.callbackSuccess(this.clickbusPayments.successResponse[response.type]);
         }
     }
 };
@@ -97,7 +107,6 @@ function ClickBusPayments() {
     };
 
     this.gateways = [];
-    this.gatewayType = null;
 
     this.personalizedOptions = arguments;
 
@@ -111,7 +120,6 @@ function ClickBusPayments() {
 
 ClickBusPayments.prototype.init = function() {
     this.start();
-    this.successResponse['token'] = {};
 };
 
 ClickBusPayments.prototype.setPaymentFormId = function(paymentFormId) {
@@ -221,12 +229,6 @@ ClickBusPayments.prototype.updateForm = function() {
 
 ClickBusPayments.prototype.generateToken = function(gatewayType) {
     var form = document.getElementById(this.options['paymentFormId']);
-
-    if (gatewayType == 'credit_card' || gatewayType == 'debit_card') {
-        this.successResponse.brand = this.getCardBrand();
-    }
-
-    this.gatewayType = gatewayType;
 
     this.clickPromise = new ClickPromise(
         function() {
@@ -429,13 +431,14 @@ MercadoPago.prototype.start = function() {
 };
 
 MercadoPago.prototype.createToken = function(form, clickPromise) {
-    var token = clickPromise.clickbusPayments.successResponse.token;
-    if (token.hasOwnProperty(this.name)) {
+    var successResponse = clickPromise.clickbusPayments.successResponse;
+    if (successResponse.hasOwnProperty(this.type)) {
         this.clearSession();
     }
 
     Mercadopago.createToken(form, function(status, response) {
         response.name = this.name;
+        response.type = this.type;
         response.content = response.id;
         clickPromise.finish(status, response);
     }.bind(this));
@@ -462,7 +465,7 @@ MundiPagg.prototype.createToken = function(form, clickPromise) {
     request.onload = function() {
         var response = JSON.parse(request.response);
         if (request.status == 201) {
-            clickPromise.finish(request.status, {content: response.token, name: this.name});
+            clickPromise.finish(request.status, {content: response.token, type: this.type, name: this.name});
             return;
         }
 
@@ -505,7 +508,7 @@ Paypal.prototype.createToken = function(form, clickPromise) {
     request.onload = function() {
         var response = JSON.parse(request.response);
         if (request.status == 200) {
-            clickPromise.finish(request.status, {content: response, name: this.name});
+            clickPromise.finish(request.status, {content: response, type: this.type, name: this.name});
             return;
         }
 
@@ -535,7 +538,7 @@ PayZen.prototype.createToken = function(form, clickPromise) {
     request.onload = function() {
         var response = JSON.parse(request.response);
         if (request.status == 200) {
-            clickPromise.finish(request.status, {content: response, name: this.name});
+            clickPromise.finish(request.status, {content: response, type: this.type, name: this.name});
             return;
         }
 

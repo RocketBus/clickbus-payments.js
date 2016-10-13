@@ -96,7 +96,7 @@
                 clickbus = new ClickBusPayments({
                     paymentFormId: 'payment_form',
                     creditcardFieldClass: 'credit_card',
-                    securityCodeFieldClass: 'security_code_other_id',
+                    securityCodeFieldClass: 'security_code_other_class',
                     expirationMonthFieldClass: 'expiration_month',
                     expirationYearFieldClass: 'expiration_year',
                     holderNameFieldClass: 'holder_name',
@@ -107,6 +107,7 @@
                 });
 
                 clickbus.subscribe(new MercadoPago('TEST-c24e58b1-a4e0-40f6-adb4-a6ca7cf60209'));
+                clickbus.subscribe(new MundiPagg());
                 clickbus.init();
             };
 
