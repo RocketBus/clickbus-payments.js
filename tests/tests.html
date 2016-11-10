@@ -7,8 +7,19 @@
 </head>
 <body>
 <div id="qunit"></div>
-<div id="qunit-fixture"></div>
+<div id="qunit-fixture">
+    <form action="" id="payment_form" method="POST"/>
+        <input type="text" class="credit_card" />
+        <input type="text" class="security_code" />
+        <input type="text" class="expiration_month" />
+        <input type="text" class="expiration_year" />
+        <input type="text" class="holder_name" />
+        <input type="text" class="doc_type" />
+        <input type="text" class="doc_number" />
+    </form>
+</div>
 <script src="http://code.jquery.com/qunit/qunit-1.18.0.js"></script>
+<script src="../vendor/qunit-parameterize/qunit-parameterize.js"></script>
 <script src="../clickbus-payments.js"></script>
 <script src="tests.js"></script>
 </body>
