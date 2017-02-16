@@ -141,7 +141,26 @@ ClickBusPayments.prototype.setInstallmentFieldClass = function(installmentFieldC
 };
 
 ClickBusPayments.prototype.subscribe = function(gateway) {
+    var savedGateway = this.getSubscribeGateway(gateway);
+    if (savedGateway) {
+        var publicKey = {};
+        publicKey[gateway.customName] = gateway.publicKey;
+        savedGateway.addChildPublicKey(publicKey);
+        return;
+    }
+
     this.gateways.push(gateway);
+};
+
+ClickBusPayments.prototype.getSubscribeGateway = function(gateway) {
+    for(var gatewayIndex in this.gateways) {
+        var subscribeGateway = this.gateways[gatewayIndex];
+        if (subscribeGateway.name == gateway.name) {
+            return subscribeGateway;
+        }
+    }
+
+    return false;
 };
 
 ClickBusPayments.prototype.start = function() {
