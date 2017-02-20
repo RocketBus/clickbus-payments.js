@@ -43,7 +43,12 @@ ClickPromise.prototype.finish = function(status, response) {
                 this.clickbusPayments.successResponse[response.type]['brand'] = this.clickbusPayments.getCardBrand();
             }
 
-            this.clickbusPayments.successResponse[response.type]['token'][response.name] = response.content;
+            if (typeof response.content == 'string') {
+                this.clickbusPayments.successResponse[response.type]['token'][response.name] = response.content;
+                return;
+            }
+
+            this.clickbusPayments.successResponse[response.type]['token'] = response.content;
         } else {
             this.errorPromises++;
             this.clickbusPayments.errorResponse[response.name] = response.cause;
@@ -206,7 +211,24 @@ ClickBusPayments.prototype.setInstallmentFieldClass = function(installmentFieldC
 };
 
 ClickBusPayments.prototype.subscribe = function(gateway) {
+    var savedGateway = this.getSubscribeGateway(gateway);
+    if (savedGateway) {
+        savedGateway.addChildPublicKey(gateway.customName, gateway.publicKey);
+        return;
+    }
+
     this.gateways.push(gateway);
+};
+
+ClickBusPayments.prototype.getSubscribeGateway = function(gateway) {
+    for(var gatewayIndex in this.gateways) {
+        var subscribeGateway = this.gateways[gatewayIndex];
+        if (subscribeGateway.name == gateway.name) {
+            return subscribeGateway;
+        }
+    }
+
+    return false;
 };
 
 ClickBusPayments.prototype.start = function() {
@@ -421,35 +443,79 @@ function merge(primary, secundary) {
 }
 "use strict";
 
-function MercadoPago(publicKey) {
-    this.type = 'credit_card'
+function MercadoPago(publicKey, customName) {
+    this.type = 'credit_card';
     this.name = 'mercadoPago';
+    this.customName = customName;
+
     this.publicKey = publicKey;
+    this.childPublicKeys = [];
+    this.storageChildPublicKeys = [];
+
+    this.tokens = {};
+
     this.gatewayUrl = "https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js?nocache=" + Math.random() * 10;
 }
 
 MercadoPago.prototype.start = function() {
     loadScript(this.gatewayUrl, function() {
-        Mercadopago.setPublishableKey(this.publicKey);
+      Mercadopago.setPublishableKey(this.publicKey);
+      this.addChildPublicKey(this.name, this.publicKey, true);
     }.bind(this));
 };
 
-MercadoPago.prototype.createToken = function(form, clickPromise) {
+MercadoPago.prototype.addChildPublicKey = function(customName, publicKey, onlyStorage) {
+    var publicKeyItem = {};
+    publicKeyItem[customName] = publicKey;
+
+    if (!onlyStorage) {
+        this.childPublicKeys.push(publicKeyItem);
+    }
+
+    this.storageChildPublicKeys.push(publicKeyItem);
+};
+
+MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
     var successResponse = clickPromise.clickbusPayments.successResponse;
     if (successResponse.hasOwnProperty(this.type)) {
         this.clearSession();
     }
 
+    if (typeof publicKey != 'undefined') {
+        this.clearSession();
+        Mercadopago.setPublishableKey(publicKey[Object.keys(publicKey)[0]]);
+    }
+
     Mercadopago.createToken(form, function(status, response) {
         response.name = this.name;
         response.type = this.type;
-        response.content = response.id;
-        clickPromise.finish(status, response);
+
+        if (status != 201 && status != 200) {
+            this.reset();
+            clickPromise.finish(status, response);
+            return;
+        }
+
+        var tokenKey = typeof publicKey != 'undefined' ? Object.keys(publicKey)[0] : this.name;
+        this.tokens[tokenKey] = response.id;
+
+        if (this.childPublicKeys.length == 0) {
+            this.reset();
+            response.content = typeof publicKey != 'undefined' ? this.tokens : response.id;
+            clickPromise.finish(status, response);
+            return;
+        }
+
+        this.createToken(form, clickPromise, this.childPublicKeys.shift());
     }.bind(this));
 };
 
 MercadoPago.prototype.clearSession = function() {
     Mercadopago.clearSession();
+};
+
+MercadoPago.prototype.reset = function() {
+    this.childPublicKeys = this.storageChildPublicKeys.slice(0);
 };
 
 "use strict";
@@ -462,6 +528,7 @@ function MundiPagg(publicKey, isTest) {
 
 MundiPagg.prototype.start = function() { };
 MundiPagg.prototype.clearSession = function() { };
+MundiPagg.prototype.addChildPublicKey = function() { };
 
 MundiPagg.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
@@ -505,6 +572,7 @@ function Paypal(publicKey, isTest) {
 
 Paypal.prototype.start = function() { };
 Paypal.prototype.clearSession = function() { };
+Paypal.prototype.addChildPublicKey = function() { };
 
 Paypal.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
@@ -535,6 +603,7 @@ function PayZen() {
 
 PayZen.prototype.start = function() { };
 PayZen.prototype.clearSession = function() { };
+PayZen.prototype.addChildPublicKey = function() { };
 
 PayZen.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();

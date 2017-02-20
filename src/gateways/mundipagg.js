@@ -8,6 +8,7 @@ function MundiPagg(publicKey, isTest) {
 
 MundiPagg.prototype.start = function() { };
 MundiPagg.prototype.clearSession = function() { };
+MundiPagg.prototype.addChildPublicKey = function() { };
 
 MundiPagg.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();

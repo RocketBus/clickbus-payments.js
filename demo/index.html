@@ -22,7 +22,7 @@
                 <form action="" method="POST" id="payment_form" onsubmit="submitForm(event)">
                     <div>
                         <label>Credit Card: </label>
-                        <input type="text" class="credit_card" data-checkout="cardNumber"  value="1234-5678-8765-4321" />
+                        <input type="text" class="credit_card" data-checkout="cardNumber"  value="4111-1111-1111-1111" />
                     </div>
                     <div>
                         <label>Security Code: </label>
@@ -106,7 +106,9 @@
                     installmentFieldClass: 'installment',
                 });
 
-                clickbus.subscribe(new MercadoPago('TEST-c24e58b1-a4e0-40f6-adb4-a6ca7cf60209'));
+                clickbus.subscribe(new MercadoPago('TEST-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'));
+                clickbus.subscribe(new MercadoPago('TEST-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 'customName'));
+                clickbus.subscribe(new MercadoPago('TEST-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 'customName'));
                 clickbus.init();
             };
 

@@ -7,6 +7,7 @@ function PayZen() {
 
 PayZen.prototype.start = function() { };
 PayZen.prototype.clearSession = function() { };
+PayZen.prototype.addChildPublicKey = function() { };
 
 PayZen.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
