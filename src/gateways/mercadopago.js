@@ -2,12 +2,12 @@
 
 function MercadoPago(publicKey, customName) {
     this.type = 'credit_card';
-    this.name = 'mercadopago';
+    this.name = 'mercadoPago';
     this.customName = customName;
 
     this.publicKey = publicKey;
     this.childPublicKeys = [];
-    this.storagechildPublicKeys = [];
+    this.storageChildPublicKeys = [];
 
     this.tokens = {};
 
@@ -29,7 +29,7 @@ MercadoPago.prototype.addChildPublicKey = function(customName, publicKey, onlySt
         this.childPublicKeys.push(publicKeyItem);
     }
 
-    this.storagechildPublicKeys.push(publicKeyItem);
+    this.storageChildPublicKeys.push(publicKeyItem);
 };
 
 MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
@@ -72,5 +72,5 @@ MercadoPago.prototype.clearSession = function() {
 };
 
 MercadoPago.prototype.reset = function() {
-    this.childPublicKeys = this.storagechildPublicKeys.slice(0);
+    this.childPublicKeys = this.storageChildPublicKeys.slice(0);
 };
