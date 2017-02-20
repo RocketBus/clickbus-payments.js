@@ -528,6 +528,7 @@ function MundiPagg(publicKey, isTest) {
 
 MundiPagg.prototype.start = function() { };
 MundiPagg.prototype.clearSession = function() { };
+MundiPagg.prototype.addChildPublicKey = function() { };
 
 MundiPagg.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
@@ -571,6 +572,7 @@ function Paypal(publicKey, isTest) {
 
 Paypal.prototype.start = function() { };
 Paypal.prototype.clearSession = function() { };
+Paypal.prototype.addChildPublicKey = function() { };
 
 Paypal.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
@@ -601,6 +603,7 @@ function PayZen() {
 
 PayZen.prototype.start = function() { };
 PayZen.prototype.clearSession = function() { };
+PayZen.prototype.addChildPublicKey = function() { };
 
 PayZen.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
