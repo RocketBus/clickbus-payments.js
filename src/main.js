@@ -10,14 +10,14 @@
  * Not Required:
  *
  *  - `paymentFormId`           HTML form id
- *  - `creditcardFieldClass`       HTML field clas for creditcard number, default credit_card
- *  - `securityCodeFieldClass`     HTML field clas for creditcard security code number, default security_code
- *  - `expirationMonthFieldClass`  HTML field clas for creditcard expiration month, default expiration_month
- *  - `expirationYearFieldClass`   HTML field clas for creditcard expiration year, default expiration_year
- *  - `holderNameFieldClass`       HTML field clas for creditcard holder name, default holder_name
- *  - `docTypeFieldClass`          HTML field clas for creditcard holder document type, default doc_type
- *  - `docNumberFieldClass`        HTML field clas for creditcard holder document number, default doc_number
- *  - `amountFieldClass`           HTML field clas for amount value, default amount
+ *  - `creditcardFieldClass`       HTML field class for creditcard number, default credit_card
+ *  - `securityCodeFieldClass`     HTML field class for creditcard security code number, default security_code
+ *  - `expirationMonthFieldClass`  HTML field class for creditcard expiration month, default expiration_month
+ *  - `expirationYearFieldClass`   HTML field class for creditcard expiration year, default expiration_year
+ *  - `holderNameFieldClass`       HTML field class for creditcard holder name, default holder_name
+ *  - `docTypeFieldClass`          HTML field class for creditcard holder document type, default doc_type
+ *  - `docNumberFieldClass`        HTML field class for creditcard holder document number, default doc_number
+ *  - `amountFieldClass`           HTML field class for amount value, default amount
  *  - `installmentFieldClass`           HTML field id for install value, default installment
  *
  * @param {Object} options
@@ -33,10 +33,14 @@ function ClickBusPayments() {
         holderNameFieldClass: "holder_name",
         docTypeFieldClass: "doc_type",
         docNumberFieldClass: "doc_number",
+        emailFieldClass: 'email',
+        phoneFieldClass: 'phone',
         amountFieldClass: "amount"
     };
 
     this.optionalValues = {
+        emailFieldClass: false,
+        phoneFieldClass: false,
         amountFieldClass: false,
         installmentFieldClass: false
     };
@@ -135,6 +139,22 @@ ClickBusPayments.prototype.setAmountFieldClass = function(amountFieldClass) {
 ClickBusPayments.prototype.setInstallmentFieldClass = function(installmentFieldClass) {
     this.options.installmentFieldClass = installmentFieldClass;
     this.personalizedOptions[0].installmentFieldClass = installmentFieldClass;
+    this.updateForm();
+    this.start();
+    return this;
+};
+
+ClickBusPayments.prototype.setEmailFieldClass = function(emailFieldClass) {
+    this.options.emailFieldClass = emailFieldClass;
+    this.personalizedOptions[0].emailFieldClass = emailFieldClass;
+    this.updateForm();
+    this.start();
+    return this;
+};
+
+ClickBusPayments.prototype.setPhoneFieldClass = function(phoneFieldClass) {
+    this.options.phoneFieldClass = phoneFieldClass;
+    this.personalizedOptions[0].phoneFieldClass = phoneFieldClass;
     this.updateForm();
     this.start();
     return this;
@@ -318,4 +338,24 @@ ClickBusPayments.prototype.getSecurityCode = function() {
     }
 
     return securityCode.value;
+};
+
+ClickBusPayments.prototype.getEmail = function() {
+    var email = this.getElement(this.options.emailFieldClass);
+
+    if (!email) {
+        throw new Error('emailFieldClass is required');
+    }
+
+    return email.value;
+};
+
+ClickBusPayments.prototype.getPhone = function() {
+    var phone = this.getElement(this.options.phoneFieldClass);
+
+    if (!phone) {
+        throw new Error('phoneFieldClass is required');
+    }
+
+    return phone.value;
 };

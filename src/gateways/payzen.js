@@ -36,6 +36,11 @@ PayZen.prototype.formatRequest = function(clickbusPayments) {
         cardNumber: clickbusPayments.getCreditCard(),
         cardExpirationMonth: clickbusPayments.getExpirationMonth(),
         cardExpirationYear: parseInt(clickbusPayments.getExpirationYear(), 10) + 2000,
-        cardSecurityCode: clickbusPayments.getSecurityCode()
+        cardSecurityCode: clickbusPayments.getSecurityCode(),
+        customer: {
+            name: clickbusPayments.getHolderName(),
+            email: clickbusPayments.getEmail(),
+            phone: clickbusPayments.getPhone()
+        }
     }
 };
