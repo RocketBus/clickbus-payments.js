@@ -213,9 +213,7 @@ ClickBusPayments.prototype.setInstallmentFieldClass = function(installmentFieldC
 ClickBusPayments.prototype.subscribe = function(gateway) {
     var savedGateway = this.getSubscribeGateway(gateway);
     if (savedGateway) {
-        var publicKey = {};
-        publicKey[gateway.customName] = gateway.publicKey;
-        savedGateway.addChildPublicKey(publicKey);
+        savedGateway.addChildPublicKey(gateway.customName, gateway.publicKey);
         return;
     }
 
@@ -452,6 +450,7 @@ function MercadoPago(publicKey, customName) {
 
     this.publicKey = publicKey;
     this.childPublicKeys = [];
+    this.storagechildPublicKeys = [];
 
     this.tokens = {};
 
@@ -461,11 +460,19 @@ function MercadoPago(publicKey, customName) {
 MercadoPago.prototype.start = function() {
     loadScript(this.gatewayUrl, function() {
       Mercadopago.setPublishableKey(this.publicKey);
+      this.addChildPublicKey(this.name, this.publicKey, true);
     }.bind(this));
 };
 
-MercadoPago.prototype.addChildPublicKey = function(publicKey) {
-    this.childPublicKeys.push(publicKey);
+MercadoPago.prototype.addChildPublicKey = function(customName, publicKey, onlyStorage) {
+    var publicKeyItem = {};
+    publicKeyItem[customName] = publicKey;
+
+    if (!onlyStorage) {
+        this.childPublicKeys.push(publicKeyItem);
+    }
+
+    this.storagechildPublicKeys.push(publicKeyItem);
 };
 
 MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
@@ -484,6 +491,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
         response.type = this.type;
 
         if (status != 201 && status != 200) {
+            this.reset();
             clickPromise.finish(status, response);
             return;
         }
@@ -492,6 +500,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
         this.tokens[tokenKey] = response.id;
 
         if (this.childPublicKeys.length == 0) {
+            this.reset();
             response.content = typeof publicKey != 'undefined' ? this.tokens : response.id;
             clickPromise.finish(status, response);
             return;
@@ -503,6 +512,11 @@ MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
 
 MercadoPago.prototype.clearSession = function() {
     Mercadopago.clearSession();
+};
+
+MercadoPago.prototype.reset = function() {
+    console.log(this.storagechildPublicKeys);
+    this.childPublicKeys = this.storagechildPublicKeys.slice(0);
 };
 
 "use strict";

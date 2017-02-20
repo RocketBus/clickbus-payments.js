@@ -143,9 +143,7 @@ ClickBusPayments.prototype.setInstallmentFieldClass = function(installmentFieldC
 ClickBusPayments.prototype.subscribe = function(gateway) {
     var savedGateway = this.getSubscribeGateway(gateway);
     if (savedGateway) {
-        var publicKey = {};
-        publicKey[gateway.customName] = gateway.publicKey;
-        savedGateway.addChildPublicKey(publicKey);
+        savedGateway.addChildPublicKey(gateway.customName, gateway.publicKey);
         return;
     }
 
