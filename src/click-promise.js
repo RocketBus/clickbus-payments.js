@@ -43,7 +43,7 @@ ClickPromise.prototype.finish = function(status, response) {
                 this.clickbusPayments.successResponse[response.type]['brand'] = this.clickbusPayments.getCardBrand();
             }
 
-            if (typeof response.content == 'string') {
+            if (!response.isMultiple) {
                 this.clickbusPayments.successResponse[response.type]['token'][response.name] = response.content;
                 return;
             }

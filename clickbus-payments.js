@@ -43,7 +43,7 @@ ClickPromise.prototype.finish = function(status, response) {
                 this.clickbusPayments.successResponse[response.type]['brand'] = this.clickbusPayments.getCardBrand();
             }
 
-            if (typeof response.content == 'string') {
+            if (!response.isMultiple) {
                 this.clickbusPayments.successResponse[response.type]['token'][response.name] = response.content;
                 return;
             }
@@ -491,6 +491,7 @@ function MercadoPago(publicKey, customName) {
     this.publicKey = publicKey;
     this.childPublicKeys = [];
     this.storageChildPublicKeys = [];
+    this.isMultiple = false;
 
     this.tokens = {};
 
@@ -509,6 +510,7 @@ MercadoPago.prototype.addChildPublicKey = function(customName, publicKey, onlySt
     publicKeyItem[customName] = publicKey;
 
     if (!onlyStorage) {
+        this.isMultiple = true;
         this.childPublicKeys.push(publicKeyItem);
     }
 
@@ -529,6 +531,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
     Mercadopago.createToken(form, function(status, response) {
         response.name = this.name;
         response.type = this.type;
+        response.isMultiple = this.isMultiple;
 
         if (status != 201 && status != 200) {
             this.reset();
