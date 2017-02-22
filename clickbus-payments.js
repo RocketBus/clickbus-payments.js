@@ -490,7 +490,7 @@ function MercadoPago(publicKey, customName) {
 
     this.publicKey = publicKey;
     this.childPublicKeys = [];
-    this.storageChildPublicKeys = [];
+    this.storagePublicKeys = [];
     this.isMultiple = false;
 
     this.tokens = {};
@@ -501,7 +501,6 @@ function MercadoPago(publicKey, customName) {
 MercadoPago.prototype.start = function() {
     loadScript(this.gatewayUrl, function() {
       Mercadopago.setPublishableKey(this.publicKey);
-      this.addChildPublicKey(this.name, this.publicKey, true);
     }.bind(this));
 };
 
@@ -514,7 +513,7 @@ MercadoPago.prototype.addChildPublicKey = function(customName, publicKey, onlySt
         this.childPublicKeys.push(publicKeyItem);
     }
 
-    this.storageChildPublicKeys.push(publicKeyItem);
+    this.storagePublicKeys.push(publicKeyItem);
 };
 
 MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
@@ -542,7 +541,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
         var tokenKey = typeof publicKey != 'undefined' ? Object.keys(publicKey)[0] : this.name;
         this.tokens[tokenKey] = response.id;
 
-        if (this.childPublicKeys.length == 0) {
+        if (this.childPublicKeys.length == 0 || this.storagePublicKeys.length == 1) {
             this.reset();
             response.content = typeof publicKey != 'undefined' ? this.tokens : response.id;
             clickPromise.finish(status, response);
@@ -558,7 +557,7 @@ MercadoPago.prototype.clearSession = function() {
 };
 
 MercadoPago.prototype.reset = function() {
-    this.childPublicKeys = this.storageChildPublicKeys.slice(0);
+    this.childPublicKeys = this.storagePublicKeys.slice(0);
 };
 
 "use strict";
