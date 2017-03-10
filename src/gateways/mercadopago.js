@@ -18,6 +18,7 @@ function MercadoPago(publicKey, customName) {
 MercadoPago.prototype.start = function() {
     loadScript(this.gatewayUrl, function() {
       Mercadopago.setPublishableKey(this.publicKey);
+      this.addChildPublicKey(this.name, this.publicKey, true);
     }.bind(this));
 };
 
