@@ -20,7 +20,7 @@ MundiPagg.prototype.createToken = function(form, clickPromise) {
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, cause: response.ErrorReport});
+        clickPromise.finish(request.status, {name: this.name, type: this.type, cause: response.ErrorReport});
     }.bind(this);
 
     request.onerror = function() {
