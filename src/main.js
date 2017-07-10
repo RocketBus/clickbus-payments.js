@@ -230,8 +230,13 @@ ClickBusPayments.prototype.getElement = function(className) {
 
     for (var index in elements) {
         var element = elements[index];
+
         if (element.offsetWidth > 0 && element.offsetHeight) {
             return element;
+        }
+
+        if (elements[0].type == 'hidden') {
+            return elements[0];
         }
     }
 };
