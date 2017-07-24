@@ -39,7 +39,7 @@ ClickPromise.prototype.finish = function(status, response) {
                 this.clickbusPayments.successResponse[response.type]['token'] = {};
             }
 
-            if (response.type == 'credit_card' || response.type == 'debit_card') {
+            if ((response.type == 'credit_card' && !response.oneClickPayment) || response.type == 'debit_card') {
                 this.clickbusPayments.successResponse[response.type]['brand'] = this.clickbusPayments.getCardBrand();
             }
 
@@ -105,7 +105,11 @@ function ClickBusPayments() {
         docNumberFieldClass: "doc_number",
         emailFieldClass: 'email',
         phoneFieldClass: 'phone',
-        amountFieldClass: "amount"
+        amountFieldClass: "amount",
+        oneClickPayment: {
+            currentPaymentClass: 'selected-one-click-payment',
+            securityCodeFieldClass: 'security_code'
+        }
     };
 
     this.optionalValues = {
@@ -435,6 +439,19 @@ ClickBusPayments.prototype.getPhone = function() {
     return phone.value;
 };
 
+ClickBusPayments.prototype.getCurrentOneClickPaymentSecurityCode = function() {
+    var securityCode = document.querySelector(
+        '.' + this.options.oneClickPayment.currentPaymentClass +
+        ' .' + this.options.oneClickPayment.securityCodeFieldClass
+    );
+
+    if (!securityCode) {
+        throw new Error('currentPaymentClass securityCodeFieldClass is required');
+    }
+
+    return securityCode.value;
+};
+
 "use strict";
 
 /**
@@ -525,12 +542,12 @@ MercadoPago.prototype.addChildPublicKey = function(customName, publicKey, onlySt
 MercadoPago.prototype.createToken = function(form, clickPromise, options, publicKey) {
 
     var defaultOptions = {
-        oneClickPay: false,
+        oneClickPayment: false,
     };
     var _options = merge(defaultOptions, options);
 
     var paymentFields = form;
-    if (_options.oneClickPay) {
+    if (_options.oneClickPayment) {
         paymentFields = form.querySelector('.selected-one-click-payment');
     }
 
@@ -548,6 +565,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, options, public
         response.name = this.name;
         response.type = this.type;
         response.isMultiple = this.isMultiple;
+        response.oneClickPayment = _options.oneClickPayment;
 
         if (status != 201 && status != 200) {
             this.reset();
@@ -588,7 +606,16 @@ MundiPagg.prototype.start = function() { };
 MundiPagg.prototype.clearSession = function() { };
 MundiPagg.prototype.addChildPublicKey = function() { };
 
-MundiPagg.prototype.createToken = function(form, clickPromise) {
+MundiPagg.prototype.createToken = function(form, clickPromise, options) {
+    var defaultOptions = {
+        oneClickPayment: false,
+    };
+    var _options = merge(defaultOptions, options);
+
+    if (_options.oneClickPayment) {
+        this.oneClickPayment(form, clickPromise);
+    }
+
     var request = new XMLHttpRequest();
     request.open('POST', '/payment/token/mundipagg');
     request.onload = function() {
@@ -620,6 +647,17 @@ MundiPagg.prototype.formatRequest = function(clickbusPayments) {
     }
 };
 
+MundiPagg.prototype.oneClickPayment = function (form, clickPromise) {
+    clickPromise.finish(
+        200,
+        {
+            content: clickbusPayments.getCurrentOneClickPaymentSecurityCode(),
+            name: this.name,
+            type: this.type,
+            oneClickPayment: true
+        }
+    );
+};
 "use strict";
 
 function Paypal(publicKey, isTest) {

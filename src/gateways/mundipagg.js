@@ -10,7 +10,16 @@ MundiPagg.prototype.start = function() { };
 MundiPagg.prototype.clearSession = function() { };
 MundiPagg.prototype.addChildPublicKey = function() { };
 
-MundiPagg.prototype.createToken = function(form, clickPromise) {
+MundiPagg.prototype.createToken = function(form, clickPromise, options) {
+    var defaultOptions = {
+        oneClickPayment: false,
+    };
+    var _options = merge(defaultOptions, options);
+
+    if (_options.oneClickPayment) {
+        this.oneClickPayment(form, clickPromise);
+    }
+
     var request = new XMLHttpRequest();
     request.open('POST', '/payment/token/mundipagg');
     request.onload = function() {
@@ -40,4 +49,16 @@ MundiPagg.prototype.formatRequest = function(clickbusPayments) {
         SecurityCode: clickbusPayments.getSecurityCode(),
         IsOneDollarAuthEnabled: false
     }
+};
+
+MundiPagg.prototype.oneClickPayment = function (form, clickPromise) {
+    clickPromise.finish(
+        200,
+        {
+            content: clickbusPayments.getCurrentOneClickPaymentSecurityCode(),
+            name: this.name,
+            type: this.type,
+            oneClickPayment: true
+        }
+    );
 };

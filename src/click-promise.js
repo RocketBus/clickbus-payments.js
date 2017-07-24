@@ -39,7 +39,7 @@ ClickPromise.prototype.finish = function(status, response) {
                 this.clickbusPayments.successResponse[response.type]['token'] = {};
             }
 
-            if (response.type == 'credit_card' || response.type == 'debit_card') {
+            if ((response.type == 'credit_card' && !response.oneClickPayment) || response.type == 'debit_card') {
                 this.clickbusPayments.successResponse[response.type]['brand'] = this.clickbusPayments.getCardBrand();
             }
 

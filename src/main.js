@@ -35,7 +35,11 @@ function ClickBusPayments() {
         docNumberFieldClass: "doc_number",
         emailFieldClass: 'email',
         phoneFieldClass: 'phone',
-        amountFieldClass: "amount"
+        amountFieldClass: "amount",
+        oneClickPayment: {
+            currentPaymentClass: 'selected-one-click-payment',
+            securityCodeFieldClass: 'security_code'
+        }
     };
 
     this.optionalValues = {
@@ -363,4 +367,17 @@ ClickBusPayments.prototype.getPhone = function() {
     }
 
     return phone.value;
+};
+
+ClickBusPayments.prototype.getCurrentOneClickPaymentSecurityCode = function() {
+    var securityCode = document.querySelector(
+        '.' + this.options.oneClickPayment.currentPaymentClass +
+        ' .' + this.options.oneClickPayment.securityCodeFieldClass
+    );
+
+    if (!securityCode) {
+        throw new Error('currentPaymentClass securityCodeFieldClass is required');
+    }
+
+    return securityCode.value;
 };
