@@ -272,7 +272,7 @@ ClickBusPayments.prototype.updateForm = function() {
     }
 };
 
-ClickBusPayments.prototype.generateToken = function(gatewayType) {
+ClickBusPayments.prototype.generateToken = function(gatewayType, options) {
     var form = document.getElementById(this.options['paymentFormId']);
 
     this.clickPromise = new ClickPromise(
@@ -281,7 +281,7 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
             gateways.forEach(function(gateway) {
                 if (gateway.type == gatewayType) {
                     this.totalPromises++;
-                    gateway.createToken(form, this);
+                    gateway.createToken(form, this, options);
                 }
             }, this);
         },
@@ -505,8 +505,8 @@ function MercadoPago(publicKey, customName) {
 
 MercadoPago.prototype.start = function() {
     loadScript(this.gatewayUrl, function() {
-      Mercadopago.setPublishableKey(this.publicKey);
-      this.addChildPublicKey(this.name, this.publicKey, true);
+        Mercadopago.setPublishableKey(this.publicKey);
+        this.addChildPublicKey(this.name, this.publicKey, true);
     }.bind(this));
 };
 
@@ -522,7 +522,18 @@ MercadoPago.prototype.addChildPublicKey = function(customName, publicKey, onlySt
     this.storagePublicKeys.push(publicKeyItem);
 };
 
-MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
+MercadoPago.prototype.createToken = function(form, clickPromise, options, publicKey) {
+
+    var defaultOptions = {
+        oneClickPay: false,
+    };
+    var _options = merge(defaultOptions, options);
+
+    var paymentFields = form;
+    if (_options.oneClickPay) {
+        paymentFields = form.querySelector('.selected-one-click-payment');
+    }
+
     var successResponse = clickPromise.clickbusPayments.successResponse;
     if (successResponse.hasOwnProperty(this.type)) {
         this.clearSession();
@@ -533,7 +544,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
         Mercadopago.setPublishableKey(publicKey[Object.keys(publicKey)[0]]);
     }
 
-    Mercadopago.createToken(form, function(status, response) {
+    Mercadopago.createToken(paymentFields, function(status, response) {
         response.name = this.name;
         response.type = this.type;
         response.isMultiple = this.isMultiple;
@@ -554,7 +565,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
             return;
         }
 
-        this.createToken(form, clickPromise, this.childPublicKeys.shift());
+        this.createToken(form, clickPromise, options, this.childPublicKeys.shift());
     }.bind(this));
 };
 
@@ -565,7 +576,6 @@ MercadoPago.prototype.clearSession = function() {
 MercadoPago.prototype.reset = function() {
     this.childPublicKeys = this.storagePublicKeys.slice(0);
 };
-
 "use strict";
 
 function MundiPagg(publicKey, isTest) {

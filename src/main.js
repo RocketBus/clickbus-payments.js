@@ -202,7 +202,7 @@ ClickBusPayments.prototype.updateForm = function() {
     }
 };
 
-ClickBusPayments.prototype.generateToken = function(gatewayType) {
+ClickBusPayments.prototype.generateToken = function(gatewayType, options) {
     var form = document.getElementById(this.options['paymentFormId']);
 
     this.clickPromise = new ClickPromise(
@@ -211,7 +211,7 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
             gateways.forEach(function(gateway) {
                 if (gateway.type == gatewayType) {
                     this.totalPromises++;
-                    gateway.createToken(form, this);
+                    gateway.createToken(form, this, options);
                 }
             }, this);
         },
