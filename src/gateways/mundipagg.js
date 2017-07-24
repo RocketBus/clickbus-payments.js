@@ -18,6 +18,8 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
 
     if (_options.oneClickPayment) {
         this.oneClickPayment(form, clickPromise);
+
+        return;
     }
 
     var request = new XMLHttpRequest();
@@ -55,7 +57,7 @@ MundiPagg.prototype.oneClickPayment = function (form, clickPromise) {
     clickPromise.finish(
         200,
         {
-            content: clickbusPayments.getCurrentOneClickPaymentSecurityCode(),
+            content: clickPromise.clickbusPayments.getCurrentOneClickPaymentCardIdByGateway(this.name),
             name: this.name,
             type: this.type,
             oneClickPayment: true

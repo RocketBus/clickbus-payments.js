@@ -108,7 +108,7 @@ function ClickBusPayments() {
         amountFieldClass: "amount",
         oneClickPayment: {
             currentPaymentClass: 'selected-one-click-payment',
-            securityCodeFieldClass: 'security_code'
+            cardIdClassPrefix: 'card-id-'
         }
     };
 
@@ -439,17 +439,17 @@ ClickBusPayments.prototype.getPhone = function() {
     return phone.value;
 };
 
-ClickBusPayments.prototype.getCurrentOneClickPaymentSecurityCode = function() {
-    var securityCode = document.querySelector(
+ClickBusPayments.prototype.getCurrentOneClickPaymentCardIdByGateway = function(gateway) {
+    var cardId = document.querySelector(
         '.' + this.options.oneClickPayment.currentPaymentClass +
-        ' .' + this.options.oneClickPayment.securityCodeFieldClass
+        ' .' + this.options.oneClickPayment.cardIdClassPrefix + gateway
     );
 
-    if (!securityCode) {
+    if (!cardId) {
         throw new Error('currentPaymentClass securityCodeFieldClass is required');
     }
 
-    return securityCode.value;
+    return cardId.value;
 };
 
 "use strict";
@@ -614,6 +614,8 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
 
     if (_options.oneClickPayment) {
         this.oneClickPayment(form, clickPromise);
+
+        return;
     }
 
     var request = new XMLHttpRequest();
@@ -651,7 +653,7 @@ MundiPagg.prototype.oneClickPayment = function (form, clickPromise) {
     clickPromise.finish(
         200,
         {
-            content: clickbusPayments.getCurrentOneClickPaymentSecurityCode(),
+            content: clickPromise.clickbusPayments.getCurrentOneClickPaymentCardIdByGateway(this.name),
             name: this.name,
             type: this.type,
             oneClickPayment: true
