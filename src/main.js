@@ -37,8 +37,8 @@ function ClickBusPayments() {
         phoneFieldClass: 'phone',
         amountFieldClass: "amount",
         oneClickPayment: {
-            currentPaymentClass: 'selected-one-click-payment',
-            cardIdClassPrefix: 'card-id-'
+            currentPaymentSelector: 'selected-one-click-payment',
+            cardIdSelectorPrefix: '.stored-payment-method-card-id-'
         }
     };
 
@@ -371,9 +371,8 @@ ClickBusPayments.prototype.getPhone = function() {
 
 ClickBusPayments.prototype.getCurrentOneClickPaymentCardIdByGateway = function(gateway) {
     var cardId = document.querySelector(
-        '.' + this.options.oneClickPayment.currentPaymentClass +
-        ' .' + this.options.oneClickPayment.cardIdClassPrefix + gateway
-    );
+        this.options.oneClickPayment.currentPaymentSelector
+    ).querySelector(this.options.oneClickPayment.cardIdSelectorPrefix + gateway);
 
     if (!cardId) {
         throw new Error('currentPaymentClass securityCodeFieldClass is required');

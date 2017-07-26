@@ -107,8 +107,8 @@ function ClickBusPayments() {
         phoneFieldClass: 'phone',
         amountFieldClass: "amount",
         oneClickPayment: {
-            currentPaymentClass: 'selected-one-click-payment',
-            cardIdClassPrefix: 'card-id-'
+            currentPaymentSelector: 'selected-one-click-payment',
+            cardIdSelectorPrefix: '.stored-payment-method-card-id-'
         }
     };
 
@@ -441,9 +441,8 @@ ClickBusPayments.prototype.getPhone = function() {
 
 ClickBusPayments.prototype.getCurrentOneClickPaymentCardIdByGateway = function(gateway) {
     var cardId = document.querySelector(
-        '.' + this.options.oneClickPayment.currentPaymentClass +
-        ' .' + this.options.oneClickPayment.cardIdClassPrefix + gateway
-    );
+        this.options.oneClickPayment.currentPaymentSelector
+    ).querySelector(this.options.oneClickPayment.cardIdSelectorPrefix + gateway);
 
     if (!cardId) {
         throw new Error('currentPaymentClass securityCodeFieldClass is required');
@@ -548,7 +547,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, options, public
 
     var paymentFields = form;
     if (_options.oneClickPayment) {
-        paymentFields = form.querySelector('.selected-one-click-payment');
+        paymentFields = form.querySelector(clickPromise.clickbusPayments.options.oneClickPayment.currentPaymentSelector);
     }
 
     var successResponse = clickPromise.clickbusPayments.successResponse;

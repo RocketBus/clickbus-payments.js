@@ -43,7 +43,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, options, public
 
     var paymentFields = form;
     if (_options.oneClickPayment) {
-        paymentFields = form.querySelector('.selected-one-click-payment');
+        paymentFields = form.querySelector(clickPromise.clickbusPayments.options.oneClickPayment.currentPaymentSelector);
     }
 
     var successResponse = clickPromise.clickbusPayments.successResponse;
