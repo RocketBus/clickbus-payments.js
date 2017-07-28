@@ -37,13 +37,13 @@ MercadoPago.prototype.addChildPublicKey = function(customName, publicKey, onlySt
 MercadoPago.prototype.createToken = function(form, clickPromise, options, publicKey) {
 
     var defaultOptions = {
-        oneClickPayment: false,
+        oneClickPayment: false
     };
     var _options = merge(defaultOptions, options);
 
     var paymentFields = form;
-    if (_options.oneClickPayment) {
-        paymentFields = form.querySelector(clickPromise.clickbusPayments.options.oneClickPayment.currentPaymentSelector);
+    if (clickPromise.clickbusPayments.options.currentPaymentSelector) {
+        paymentFields = form.querySelector(clickPromise.clickbusPayments.options.currentPaymentSelector);
     }
 
     var successResponse = clickPromise.clickbusPayments.successResponse;

@@ -36,8 +36,8 @@ function ClickBusPayments() {
         emailFieldClass: 'email',
         phoneFieldClass: 'phone',
         amountFieldClass: "amount",
+        currentPaymentSelector: null,
         oneClickPayment: {
-            currentPaymentSelector: 'selected-one-click-payment',
             cardIdSelectorPrefix: '.stored-payment-method-card-id-'
         }
     };
@@ -369,10 +369,20 @@ ClickBusPayments.prototype.getPhone = function() {
     return phone.value;
 };
 
+ClickBusPayments.prototype.getCurrentPaymentElement = function() {
+    var element = document.querySelector('#' + this.options.paymentFormId);
+
+    if (this.options.currentPaymentSelector) {
+        element = element.querySelector(this.options.currentPaymentSelector);
+    }
+
+    return element;
+};
+
 ClickBusPayments.prototype.getCurrentOneClickPaymentCardIdByGateway = function(gateway) {
-    var cardId = document.querySelector(
-        this.options.oneClickPayment.currentPaymentSelector
-    ).querySelector(this.options.oneClickPayment.cardIdSelectorPrefix + gateway);
+    var element =this.getCurrentPaymentElement();
+
+    var cardId = element.querySelector(this.options.oneClickPayment.cardIdSelectorPrefix + gateway);
 
     if (!cardId) {
         throw new Error('currentPaymentClass securityCodeFieldClass is required');
