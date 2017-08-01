@@ -450,7 +450,7 @@ ClickBusPayments.prototype.getCurrentPaymentElement = function() {
 };
 
 ClickBusPayments.prototype.getCurrentOneClickPaymentCardIdByGateway = function(gateway) {
-    var element =this.getCurrentPaymentElement();
+    var element = this.getCurrentPaymentElement();
 
     var cardId = element.querySelector(this.options.oneClickPayment.cardIdSelectorPrefix + gateway);
 
