@@ -39,7 +39,7 @@ ClickPromise.prototype.finish = function(status, response) {
                 this.clickbusPayments.successResponse[response.type]['token'] = {};
             }
 
-            if (response.type == 'credit_card' || response.type == 'debit_card') {
+            if ((response.type == 'credit_card' && !response.oneClickPayment) || response.type == 'debit_card') {
                 this.clickbusPayments.successResponse[response.type]['brand'] = this.clickbusPayments.getCardBrand();
             }
 
@@ -105,7 +105,11 @@ function ClickBusPayments() {
         docNumberFieldClass: "doc_number",
         emailFieldClass: 'email',
         phoneFieldClass: 'phone',
-        amountFieldClass: "amount"
+        amountFieldClass: "amount",
+        currentPaymentSelector: null,
+        oneClickPayment: {
+            cardIdSelectorPrefix: '.stored-payment-method-card-id-'
+        }
     };
 
     this.optionalValues = {
@@ -272,7 +276,7 @@ ClickBusPayments.prototype.updateForm = function() {
     }
 };
 
-ClickBusPayments.prototype.generateToken = function(gatewayType) {
+ClickBusPayments.prototype.generateToken = function(gatewayType, options) {
     var form = document.getElementById(this.options['paymentFormId']);
 
     this.clickPromise = new ClickPromise(
@@ -281,7 +285,7 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
             gateways.forEach(function(gateway) {
                 if (gateway.type == gatewayType) {
                     this.totalPromises++;
-                    gateway.createToken(form, this);
+                    gateway.createToken(form, this, options);
                 }
             }, this);
         },
@@ -435,6 +439,28 @@ ClickBusPayments.prototype.getPhone = function() {
     return phone.value;
 };
 
+ClickBusPayments.prototype.getCurrentPaymentElement = function() {
+    var element = document.querySelector('#' + this.options.paymentFormId);
+
+    if (this.options.currentPaymentSelector) {
+        element = element.querySelector(this.options.currentPaymentSelector);
+    }
+
+    return element;
+};
+
+ClickBusPayments.prototype.getCurrentOneClickPaymentCardIdByGateway = function(gateway) {
+    var element = this.getCurrentPaymentElement();
+
+    var cardId = element.querySelector(this.options.oneClickPayment.cardIdSelectorPrefix + gateway);
+
+    if (!cardId) {
+        throw new Error('currentPaymentClass securityCodeFieldClass is required');
+    }
+
+    return cardId.value;
+};
+
 "use strict";
 
 /**
@@ -505,8 +531,8 @@ function MercadoPago(publicKey, customName) {
 
 MercadoPago.prototype.start = function() {
     loadScript(this.gatewayUrl, function() {
-      Mercadopago.setPublishableKey(this.publicKey);
-      this.addChildPublicKey(this.name, this.publicKey, true);
+        Mercadopago.setPublishableKey(this.publicKey);
+        this.addChildPublicKey(this.name, this.publicKey, true);
     }.bind(this));
 };
 
@@ -522,7 +548,18 @@ MercadoPago.prototype.addChildPublicKey = function(customName, publicKey, onlySt
     this.storagePublicKeys.push(publicKeyItem);
 };
 
-MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
+MercadoPago.prototype.createToken = function(form, clickPromise, options, publicKey) {
+
+    var defaultOptions = {
+        oneClickPayment: false
+    };
+    var _options = merge(defaultOptions, options);
+
+    var paymentFields = form;
+    if (clickPromise.clickbusPayments.options.currentPaymentSelector) {
+        paymentFields = form.querySelector(clickPromise.clickbusPayments.options.currentPaymentSelector);
+    }
+
     var successResponse = clickPromise.clickbusPayments.successResponse;
     if (successResponse.hasOwnProperty(this.type)) {
         this.clearSession();
@@ -533,10 +570,11 @@ MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
         Mercadopago.setPublishableKey(publicKey[Object.keys(publicKey)[0]]);
     }
 
-    Mercadopago.createToken(form, function(status, response) {
+    Mercadopago.createToken(paymentFields, function(status, response) {
         response.name = this.name;
         response.type = this.type;
         response.isMultiple = this.isMultiple;
+        response.oneClickPayment = _options.oneClickPayment;
 
         if (status != 201 && status != 200) {
             this.reset();
@@ -554,7 +592,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
             return;
         }
 
-        this.createToken(form, clickPromise, this.childPublicKeys.shift());
+        this.createToken(form, clickPromise, options, this.childPublicKeys.shift());
     }.bind(this));
 };
 
@@ -565,7 +603,6 @@ MercadoPago.prototype.clearSession = function() {
 MercadoPago.prototype.reset = function() {
     this.childPublicKeys = this.storagePublicKeys.slice(0);
 };
-
 "use strict";
 
 function MundiPagg(publicKey, isTest) {
@@ -578,7 +615,18 @@ MundiPagg.prototype.start = function() { };
 MundiPagg.prototype.clearSession = function() { };
 MundiPagg.prototype.addChildPublicKey = function() { };
 
-MundiPagg.prototype.createToken = function(form, clickPromise) {
+MundiPagg.prototype.createToken = function(form, clickPromise, options) {
+    var defaultOptions = {
+        oneClickPayment: false,
+    };
+    var _options = merge(defaultOptions, options);
+
+    if (_options.oneClickPayment) {
+        this.oneClickPayment(form, clickPromise);
+
+        return;
+    }
+
     var request = new XMLHttpRequest();
     request.open('POST', '/payment/token/mundipagg');
     request.onload = function() {
@@ -610,6 +658,17 @@ MundiPagg.prototype.formatRequest = function(clickbusPayments) {
     }
 };
 
+MundiPagg.prototype.oneClickPayment = function (form, clickPromise) {
+    clickPromise.finish(
+        200,
+        {
+            content: clickPromise.clickbusPayments.getCurrentOneClickPaymentCardIdByGateway(this.name),
+            name: this.name,
+            type: this.type,
+            oneClickPayment: true
+        }
+    );
+};
 "use strict";
 
 function Paypal(publicKey, isTest) {

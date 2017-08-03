@@ -17,8 +17,8 @@ function MercadoPago(publicKey, customName) {
 
 MercadoPago.prototype.start = function() {
     loadScript(this.gatewayUrl, function() {
-      Mercadopago.setPublishableKey(this.publicKey);
-      this.addChildPublicKey(this.name, this.publicKey, true);
+        Mercadopago.setPublishableKey(this.publicKey);
+        this.addChildPublicKey(this.name, this.publicKey, true);
     }.bind(this));
 };
 
@@ -34,7 +34,18 @@ MercadoPago.prototype.addChildPublicKey = function(customName, publicKey, onlySt
     this.storagePublicKeys.push(publicKeyItem);
 };
 
-MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
+MercadoPago.prototype.createToken = function(form, clickPromise, options, publicKey) {
+
+    var defaultOptions = {
+        oneClickPayment: false
+    };
+    var _options = merge(defaultOptions, options);
+
+    var paymentFields = form;
+    if (clickPromise.clickbusPayments.options.currentPaymentSelector) {
+        paymentFields = form.querySelector(clickPromise.clickbusPayments.options.currentPaymentSelector);
+    }
+
     var successResponse = clickPromise.clickbusPayments.successResponse;
     if (successResponse.hasOwnProperty(this.type)) {
         this.clearSession();
@@ -45,10 +56,11 @@ MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
         Mercadopago.setPublishableKey(publicKey[Object.keys(publicKey)[0]]);
     }
 
-    Mercadopago.createToken(form, function(status, response) {
+    Mercadopago.createToken(paymentFields, function(status, response) {
         response.name = this.name;
         response.type = this.type;
         response.isMultiple = this.isMultiple;
+        response.oneClickPayment = _options.oneClickPayment;
 
         if (status != 201 && status != 200) {
             this.reset();
@@ -66,7 +78,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, publicKey) {
             return;
         }
 
-        this.createToken(form, clickPromise, this.childPublicKeys.shift());
+        this.createToken(form, clickPromise, options, this.childPublicKeys.shift());
     }.bind(this));
 };
 

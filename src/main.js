@@ -35,7 +35,11 @@ function ClickBusPayments() {
         docNumberFieldClass: "doc_number",
         emailFieldClass: 'email',
         phoneFieldClass: 'phone',
-        amountFieldClass: "amount"
+        amountFieldClass: "amount",
+        currentPaymentSelector: null,
+        oneClickPayment: {
+            cardIdSelectorPrefix: '.stored-payment-method-card-id-'
+        }
     };
 
     this.optionalValues = {
@@ -202,7 +206,7 @@ ClickBusPayments.prototype.updateForm = function() {
     }
 };
 
-ClickBusPayments.prototype.generateToken = function(gatewayType) {
+ClickBusPayments.prototype.generateToken = function(gatewayType, options) {
     var form = document.getElementById(this.options['paymentFormId']);
 
     this.clickPromise = new ClickPromise(
@@ -211,7 +215,7 @@ ClickBusPayments.prototype.generateToken = function(gatewayType) {
             gateways.forEach(function(gateway) {
                 if (gateway.type == gatewayType) {
                     this.totalPromises++;
-                    gateway.createToken(form, this);
+                    gateway.createToken(form, this, options);
                 }
             }, this);
         },
@@ -363,4 +367,26 @@ ClickBusPayments.prototype.getPhone = function() {
     }
 
     return phone.value;
+};
+
+ClickBusPayments.prototype.getCurrentPaymentElement = function() {
+    var element = document.querySelector('#' + this.options.paymentFormId);
+
+    if (this.options.currentPaymentSelector) {
+        element = element.querySelector(this.options.currentPaymentSelector);
+    }
+
+    return element;
+};
+
+ClickBusPayments.prototype.getCurrentOneClickPaymentCardIdByGateway = function(gateway) {
+    var element = this.getCurrentPaymentElement();
+
+    var cardId = element.querySelector(this.options.oneClickPayment.cardIdSelectorPrefix + gateway);
+
+    if (!cardId) {
+        throw new Error('currentPaymentClass securityCodeFieldClass is required');
+    }
+
+    return cardId.value;
 };
