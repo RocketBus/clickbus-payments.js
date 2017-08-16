@@ -78,6 +78,11 @@ QUnit
         { number: '6304058239126897', brand: 'mastercard'},
         { number: '5899143634566237', brand: 'mastercard'},
         { number: '2221003215406351', brand: 'mastercard'},
+        { number: '5153294463086430', brand: 'mastercard'},
+        { number: '5321658029340110', brand: 'mastercard'},
+        { number: '5547848288642761', brand: 'mastercard'},
+        { number: '5413514854661232', brand: 'mastercard'},
+        { number: '5436271447363724', brand: 'mastercard'},
 
         {number: '6062821933605694', brand: 'hipercard'},
         {number: '3841001576508225', brand: 'hipercard'},
