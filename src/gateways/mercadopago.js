@@ -62,6 +62,8 @@ MercadoPago.prototype.createToken = function(form, clickPromise, options, public
         response.isMultiple = this.isMultiple;
         response.oneClickPayment = _options.oneClickPayment;
 
+        logger(response);
+
         if (status != 201 && status != 200) {
             this.reset();
             clickPromise.finish(status, response);
@@ -70,6 +72,8 @@ MercadoPago.prototype.createToken = function(form, clickPromise, options, public
 
         var tokenKey = typeof publicKey != 'undefined' ? Object.keys(publicKey)[0] : this.name;
         this.tokens[tokenKey] = response.id;
+
+        logger(this.tokens);
 
         if (this.childPublicKeys.length == 0 || this.storagePublicKeys.length == 1) {
             this.reset();

@@ -14,6 +14,25 @@ function addEvent(element, eventName, handler) {
     }
 }
 
+function logger(message)
+{
+    try {
+        if (typeof message === 'object') {
+            for (var index in message) {
+                trackJs.addMetadata(index, message[index]);
+            }
+
+            return true;
+        }
+
+        trackJs.track(message);
+    } catch(e) {
+        console.log("Track.js is not available.");
+    }
+
+    return false;
+}
+
 function loadScript(url, callback) {
     // Adding the script tag to the head as suggested before
     var head = document.getElementsByTagName('head')[0];

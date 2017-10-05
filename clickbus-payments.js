@@ -477,6 +477,25 @@ function addEvent(element, eventName, handler) {
     }
 }
 
+function logger(message)
+{
+    try {
+        if (typeof message === 'object') {
+            for (var index in message) {
+                trackJs.addMetadata(index, message[index]);
+            }
+
+            return true;
+        }
+
+        trackJs.track(message);
+    } catch(e) {
+        console.log("Track.js is not available.");
+    }
+
+    return false;
+}
+
 function loadScript(url, callback) {
     // Adding the script tag to the head as suggested before
     var head = document.getElementsByTagName('head')[0];
@@ -512,6 +531,7 @@ function merge(primary, secundary) {
 
     return primary;
 }
+
 "use strict";
 
 function MercadoPago(publicKey, customName) {
@@ -582,8 +602,12 @@ MercadoPago.prototype.createToken = function(form, clickPromise, options, public
             return;
         }
 
+        logger(response);
+
         var tokenKey = typeof publicKey != 'undefined' ? Object.keys(publicKey)[0] : this.name;
         this.tokens[tokenKey] = response.id;
+
+        logger(this.tokens);
 
         if (this.childPublicKeys.length == 0 || this.storagePublicKeys.length == 1) {
             this.reset();
@@ -603,6 +627,7 @@ MercadoPago.prototype.clearSession = function() {
 MercadoPago.prototype.reset = function() {
     this.childPublicKeys = this.storagePublicKeys.slice(0);
 };
+
 "use strict";
 
 function MundiPagg(publicKey, isTest) {
