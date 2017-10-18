@@ -25,6 +25,7 @@ Paypal.prototype.createToken = function(form, clickPromise) {
 
     request.onerror = function() {
         console.log(request);
+        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
     };
 
     request.send();

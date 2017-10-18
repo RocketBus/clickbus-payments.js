@@ -596,13 +596,13 @@ MercadoPago.prototype.createToken = function(form, clickPromise, options, public
         response.isMultiple = this.isMultiple;
         response.oneClickPayment = _options.oneClickPayment;
 
+        logger(response);
+
         if (status != 201 && status != 200) {
             this.reset();
             clickPromise.finish(status, response);
             return;
         }
-
-        logger(response);
 
         var tokenKey = typeof publicKey != 'undefined' ? Object.keys(publicKey)[0] : this.name;
         this.tokens[tokenKey] = response.id;
@@ -665,7 +665,7 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
     }.bind(this);
 
     request.onerror = function() {
-
+        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));
@@ -721,6 +721,7 @@ Paypal.prototype.createToken = function(form, clickPromise) {
 
     request.onerror = function() {
         console.log(request);
+        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
     };
 
     request.send();
@@ -751,7 +752,7 @@ PayZen.prototype.createToken = function(form, clickPromise) {
     }.bind(this);
 
     request.onerror = function() {
-
+        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));

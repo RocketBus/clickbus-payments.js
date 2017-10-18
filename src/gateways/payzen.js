@@ -23,7 +23,7 @@ PayZen.prototype.createToken = function(form, clickPromise) {
     }.bind(this);
 
     request.onerror = function() {
-
+        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));

@@ -35,7 +35,7 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
     }.bind(this);
 
     request.onerror = function() {
-
+        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));
