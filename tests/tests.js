@@ -88,6 +88,8 @@ QUnit
         {number: '3841001576508225', brand: 'hipercard'},
         {number: '3841402142538680', brand: 'hipercard'},
         {number: '3841608185234355', brand: 'hipercard'},
+        {number: '6375681576967633', brand: 'hipercard'},
+        {number: '6370951933605694', brand: 'hipercard'},
 
         {number: '4389351162478846', brand: 'elo'},
         {number: '5067316735601105', brand: 'elo'},
@@ -96,7 +98,15 @@ QUnit
         {number: '4514160253889961', brand: 'elo'},
         {number: '5041759412964091', brand: 'elo'},
         {number: '6363683883752082', brand: 'elo'},
-        {number: '6277801718462884', brand: 'elo'}
+        {number: '6277801718462884', brand: 'elo'},
+        {number: '5090914163142818', brand: 'elo'},
+        {number: '6509143817930495', brand: 'elo'},
+        {number: '6509017318077706', brand: 'elo'},
+        {number: '6504855329365664', brand: 'elo'},
+        {number: '6504860640453968', brand: 'elo'},
+        {number: '6550014871327768', brand: 'elo'},
+        {number: '6550033817930495', brand: 'elo'},
+        {number: '6504871332035170', brand: 'elo'}
     ])
     .test('Clickbus detect card brand', function(params, assert) {
         var creditCardElements = document.getElementsByClassName('credit_card');
