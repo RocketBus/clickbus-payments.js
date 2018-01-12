@@ -12,7 +12,7 @@ function MercadoPago(publicKey, customName) {
 
     this.tokens = {};
 
-    this.gatewayUrl = "https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js?nocache=" + Math.random() * 10;
+    this.gatewayUrl = "https://secure.mlstatic.com/sdk/javascript/beta/v1/mercadopago.js?nocache=" + Math.random() * 10;
 }
 
 MercadoPago.prototype.start = function() {
