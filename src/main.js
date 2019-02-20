@@ -215,7 +215,12 @@ ClickBusPayments.prototype.generateToken = function(gatewayType, options) {
             gateways.forEach(function(gateway) {
                 if (gateway.type == gatewayType) {
                     this.totalPromises++;
-                    gateway.createToken(form, this, options);
+
+                    try {
+                        gateway.createToken(form, this, options);
+                    } catch (e) {
+                        throw "generateTokenException";
+                    }
                 }
             }, this);
         },
