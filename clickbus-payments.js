@@ -501,7 +501,7 @@ function logger(message)
     return false;
 }
 
-function loadScript(url, callback) {
+function loadScript(url, name, callback) {
     // Adding the script tag to the head as suggested before
     var head = document.getElementsByTagName('head')[0];
     var script = document.createElement('script');
@@ -512,6 +512,7 @@ function loadScript(url, callback) {
     // There are several events for cross browser compatibility.
     script.onreadystatechange = callback;
     script.onload = callback;
+    script.id = name
 
     // Fire the loading
     head.appendChild(script);
@@ -555,7 +556,7 @@ function MercadoPago(publicKey, customName) {
 }
 
 MercadoPago.prototype.start = function() {
-    loadScript(this.gatewayUrl, function() {
+    loadScript(this.gatewayUrl, this.name, function() {
         Mercadopago.setPublishableKey(this.publicKey);
         this.addChildPublicKey(this.name, this.publicKey, true);
     }.bind(this));
@@ -638,7 +639,8 @@ MercadoPago.prototype.reset = function() {
 function MundiPagg(publicKey, isTest) {
     this.type = 'credit_card';
     this.name = 'mundipagg';
-    this.publicKey = publicKey;
+
+    this.gatewayUrl = "https://api.mundipagg.com/core/v1/tokens?appId="+publicKey;
 }
 
 MundiPagg.prototype.start = function() { };
@@ -658,11 +660,13 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
     }
 
     var request = new XMLHttpRequest();
-    request.open('POST', '/payment/token/mundipagg');
+    request.open('POST', this.gatewayUrl);
+    request.setRequestHeader("Content-Type", "application/json");
     request.onload = function() {
         var response = JSON.parse(request.response);
-        if (request.status == 201) {
-            clickPromise.finish(request.status, {content: response.token, type: this.type, name: this.name});
+
+        if (request.status == 200) {
+            clickPromise.finish(request.status, {content: response.id, type: this.type, name: this.name});
             return;
         }
 
@@ -678,13 +682,15 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
 
 MundiPagg.prototype.formatRequest = function(clickbusPayments) {
     return {
-        CreditCardBrand: clickbusPayments.getCardBrand(),
-        CreditCardNumber: clickbusPayments.getCreditCard(),
-        ExpMonth: clickbusPayments.getExpirationMonth(),
-        ExpYear: clickbusPayments.getExpirationYear(),
-        HolderName: clickbusPayments.getHolderName(),
-        SecurityCode: clickbusPayments.getSecurityCode(),
-        IsOneDollarAuthEnabled: false
+        "card": {
+            number: clickbusPayments.getCreditCard(),
+            exp_month: clickbusPayments.getExpirationMonth(),
+            exp_year: clickbusPayments.getExpirationYear(),
+            holder_name: clickbusPayments.getHolderName(),
+            cvv: clickbusPayments.getSecurityCode(),
+            type: this.type
+        }
+
     }
 };
 
@@ -699,6 +705,7 @@ MundiPagg.prototype.oneClickPayment = function (form, clickPromise) {
         }
     );
 };
+
 "use strict";
 
 function EletronicFundsTransfer() {

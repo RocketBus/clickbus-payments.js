@@ -3,7 +3,8 @@
 function MundiPagg(publicKey, isTest) {
     this.type = 'credit_card';
     this.name = 'mundipagg';
-    this.publicKey = publicKey;
+
+    this.gatewayUrl = "https://api.mundipagg.com/core/v1/tokens?appId="+publicKey;
 }
 
 MundiPagg.prototype.start = function() { };
@@ -23,11 +24,13 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
     }
 
     var request = new XMLHttpRequest();
-    request.open('POST', '/payment/token/mundipagg');
+    request.open('POST', this.gatewayUrl);
+    request.setRequestHeader("Content-Type", "application/json");
     request.onload = function() {
         var response = JSON.parse(request.response);
-        if (request.status == 201) {
-            clickPromise.finish(request.status, {content: response.token, type: this.type, name: this.name});
+
+        if (request.status == 200) {
+            clickPromise.finish(request.status, {content: response.id, type: this.type, name: this.name});
             return;
         }
 
@@ -43,13 +46,15 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
 
 MundiPagg.prototype.formatRequest = function(clickbusPayments) {
     return {
-        CreditCardBrand: clickbusPayments.getCardBrand(),
-        CreditCardNumber: clickbusPayments.getCreditCard(),
-        ExpMonth: clickbusPayments.getExpirationMonth(),
-        ExpYear: clickbusPayments.getExpirationYear(),
-        HolderName: clickbusPayments.getHolderName(),
-        SecurityCode: clickbusPayments.getSecurityCode(),
-        IsOneDollarAuthEnabled: false
+        "card": {
+            number: clickbusPayments.getCreditCard(),
+            exp_month: clickbusPayments.getExpirationMonth(),
+            exp_year: clickbusPayments.getExpirationYear(),
+            holder_name: clickbusPayments.getHolderName(),
+            cvv: clickbusPayments.getSecurityCode(),
+            type: this.type
+        }
+
     }
 };
 
