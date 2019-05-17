@@ -29,7 +29,5 @@
     "src",
     "demo"
     ],
-    "devDependencies": {
-        "qunit-parameterize": "0.4.*"
-    }
+    "devDependencies": { }
 }
