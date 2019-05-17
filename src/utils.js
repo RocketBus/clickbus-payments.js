@@ -33,7 +33,7 @@ function logger(message)
     return false;
 }
 
-function loadScript(url, name, callback) {
+function loadScript(url, callback) {
     // Adding the script tag to the head as suggested before
     var head = document.getElementsByTagName('head')[0];
     var script = document.createElement('script');
@@ -44,7 +44,6 @@ function loadScript(url, name, callback) {
     // There are several events for cross browser compatibility.
     script.onreadystatechange = callback;
     script.onload = callback;
-    script.id = name
 
     // Fire the loading
     head.appendChild(script);
