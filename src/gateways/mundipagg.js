@@ -4,7 +4,7 @@ function MundiPagg(publicKey, isTest) {
     this.type = 'credit_card';
     this.name = 'mundipagg';
 
-    this.gatewayUrl = "https://api.mundipagg.com/core/v1/tokens?appId="+publicKey;
+    this.gatewayUrl = "https://api.mundipagg.comasdadasdasdcore/v1/tokens?appId="+publicKey;
 }
 
 MundiPagg.prototype.start = function() { };
