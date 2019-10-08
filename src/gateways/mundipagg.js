@@ -4,7 +4,7 @@ function MundiPagg(publicKey, isTest) {
     this.type = 'credit_card';
     this.name = 'mundipagg';
 
-    this.gatewayUrl = "https://api.mundipagg.comasdadasdasdcore/v1/tokens?appId="+publicKey;
+    this.gatewayUrl = "https://www.mocky.io/v2/5d9c819f31000037c92fc621"+publicKey;
 }
 
 MundiPagg.prototype.start = function() { };
@@ -27,14 +27,14 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
     request.open('POST', this.gatewayUrl);
     request.setRequestHeader("Content-Type", "application/json");
     request.onload = function() {
-        var response = JSON.parse(request.response);
-
         if (request.status == 200) {
+            var response = JSON.parse(request.response);
+
             clickPromise.finish(request.status, {content: response.id, type: this.type, name: this.name});
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, type: this.type, cause: response.ErrorReport});
+        clickPromise.finish(request.status, {name: this.name, type: this.type, cause: 'error'});
     }.bind(this);
 
     request.onerror = function() {
