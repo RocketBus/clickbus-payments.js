@@ -13,13 +13,13 @@ PayZen.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
     request.open('POST', '/payment/token/debit_card');
     request.onload = function() {
-        var response = JSON.parse(request.response);
         if (request.status == 200) {
+            var response = JSON.parse(request.response);
             clickPromise.finish(request.status, {content: response, type: this.type, name: this.name});
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, cause: response.ErrorReport});
+        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
     }.bind(this);
 
     request.onerror = function() {
