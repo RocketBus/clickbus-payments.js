@@ -731,7 +731,7 @@ Paypal.prototype.addChildPublicKey = function() { };
 
 Paypal.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
-    request.open('GET', '/payment/token/paypal');
+    request.open('GET', 'https://www.mocky.io/v2/5d9c819f31000037c92fc621');
     request.onload = function() {
         if (request.status == 200) {
             var response = JSON.parse(request.response);
@@ -763,7 +763,7 @@ PayZen.prototype.addChildPublicKey = function() { };
 
 PayZen.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
-    request.open('POST', '/payment/token/debit_card');
+    request.open('POST', 'https://www.mocky.io/v2/5d9c819f31000037c92fc621');
     request.onload = function() {
         if (request.status == 200) {
             var response = JSON.parse(request.response);
