@@ -673,7 +673,7 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
     }.bind(this);
 
     request.onerror = function() {
-        clickPromise.finish(request.status, {name: this.name, cause: 'error', type: 'credit_card'});
+        clickPromise.finish(request.status, {name: 'mundipagg', cause: 'error', type: 'credit_card'});
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));
@@ -739,11 +739,10 @@ Paypal.prototype.createToken = function(form, clickPromise) {
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
+        clickPromise.finish(request.status, {name: this.name, cause: 'error', type: this.type});
     }.bind(this);
 
     request.onerror = function() {
-        console.log(request);
         clickPromise.finish(request.status, {name: this.name, cause: 'error'});
     };
 
@@ -771,7 +770,7 @@ PayZen.prototype.createToken = function(form, clickPromise) {
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
+        clickPromise.finish(request.status, {name: this.name, cause: 'error', type: this.type});
     }.bind(this);
 
     request.onerror = function() {
