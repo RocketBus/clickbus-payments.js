@@ -23,10 +23,11 @@
  * @param {Object} options
  * @api public
  */
+
 function ClickBusPayments() {
     this.options = {
         paymentFormId: "payment_form",
-        creditcardFieldClass: "credit_card",
+        creditcardFieldClass: TYPE_CREDIT_CARD,
         securityCodeFieldClass: "security_code",
         expirationMonthFieldClass: "expiration_month",
         expirationYearFieldClass: "expiration_year",

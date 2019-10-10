@@ -3,6 +3,12 @@
 /**
  * Created by tiagobutzke on 7/2/15.
  */
+
+
+var ERROR_TEXT = 'error';
+var TYPE_CREDIT_CARD = 'credit_card';
+var TYPE_DEBIT_CARD = 'debit_card';
+
 function ClickPromise(callable, clickbusPayments) {
     this.callable = callable;
     this.clickbusPayments = clickbusPayments;
@@ -39,7 +45,7 @@ ClickPromise.prototype.finish = function(status, response) {
                 this.clickbusPayments.successResponse[response.type]['token'] = {};
             }
 
-            if ((response.type == 'credit_card' && !response.oneClickPayment) || response.type == 'debit_card') {
+            if ((response.type == TYPE_CREDIT_CARD && !response.oneClickPayment) || response.type == TYPE_DEBIT_CARD) {
                 this.clickbusPayments.successResponse[response.type]['brand'] = this.clickbusPayments.getCardBrand();
             }
 
@@ -93,10 +99,11 @@ ClickPromise.prototype.finish = function(status, response) {
  * @param {Object} options
  * @api public
  */
+
 function ClickBusPayments() {
     this.options = {
         paymentFormId: "payment_form",
-        creditcardFieldClass: "credit_card",
+        creditcardFieldClass: TYPE_CREDIT_CARD,
         securityCodeFieldClass: "security_code",
         expirationMonthFieldClass: "expiration_month",
         expirationYearFieldClass: "expiration_year",
@@ -540,7 +547,7 @@ function merge(primary, secundary) {
 "use strict";
 
 function MercadoPago(publicKey, customName) {
-    this.type = 'credit_card';
+    this.type = TYPE_CREDIT_CARD;
     this.name = 'mercadoPago';
     this.customName = customName;
 
@@ -635,9 +642,11 @@ MercadoPago.prototype.reset = function() {
 
 "use strict";
 
+var MUNDIPAGG_NAME = 'mundipagg';
+
 function MundiPagg(publicKey, isTest) {
-    this.type = 'credit_card';
-    this.name = 'mundipagg';
+    this.type = TYPE_CREDIT_CARD;
+    this.name = MUNDIPAGG_NAME;
 
     this.gatewayUrl = "https://api.mundipagg.com/core/v1/tokens?appId="+publicKey;
 }
@@ -662,18 +671,18 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
     request.open('POST', this.gatewayUrl);
     request.setRequestHeader("Content-Type", "application/json");
     request.onload = function() {
-        var response = JSON.parse(request.response);
-
         if (request.status == 200) {
+            var response = JSON.parse(request.response);
+
             clickPromise.finish(request.status, {content: response.id, type: this.type, name: this.name});
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, type: this.type, cause: response.ErrorReport});
+        clickPromise.finish(request.status, {name: this.name, type: this.type, cause: ERROR_TEXT});
     }.bind(this);
 
     request.onerror = function() {
-        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
+        clickPromise.finish(request.status, {name: MUNDIPAGG_NAME, cause: ERROR_TEXT, type: TYPE_CREDIT_CARD});
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));
@@ -719,9 +728,11 @@ EletronicFundsTransfer.prototype.createToken = function() { };
 
 "use strict";
 
+var PAYPAL_NAME = 'paypal';
+
 function Paypal(publicKey, isTest) {
-    this.type = 'paypal';
-    this.name = 'paypal';
+    this.type = PAYPAL_NAME;
+    this.name = PAYPAL_NAME;
     this.publicKey = publicKey;
 }
 
@@ -733,18 +744,17 @@ Paypal.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
     request.open('GET', '/payment/token/paypal');
     request.onload = function() {
-        var response = JSON.parse(request.response);
         if (request.status == 200) {
+            var response = JSON.parse(request.response);
             clickPromise.finish(request.status, {content: response, type: this.type, name: this.name});
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, cause: response.ErrorReport});
+        clickPromise.finish(request.status, {name: this.name, cause: ERROR_TEXT, type: this.type});
     }.bind(this);
 
     request.onerror = function() {
-        console.log(request);
-        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
+        clickPromise.finish(request.status, {name: PAYPAL_NAME, cause: ERROR_TEXT, type: PAYPAL_NAME});
     };
 
     request.send();
@@ -752,9 +762,11 @@ Paypal.prototype.createToken = function(form, clickPromise) {
 
 "use strict";
 
+var PAYZEN_NAME = 'payzen';
+
 function PayZen() {
-    this.type = 'debit_card';
-    this.name = 'payzen';
+    this.type = TYPE_DEBIT_CARD;
+    this.name = PAYZEN_NAME;
 }
 
 PayZen.prototype.start = function() { };
@@ -765,17 +777,17 @@ PayZen.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
     request.open('POST', '/payment/token/debit_card');
     request.onload = function() {
-        var response = JSON.parse(request.response);
         if (request.status == 200) {
+            var response = JSON.parse(request.response);
             clickPromise.finish(request.status, {content: response, type: this.type, name: this.name});
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, cause: response.ErrorReport});
+        clickPromise.finish(request.status, {name: this.name, cause: ERROR_TEXT, type: this.type});
     }.bind(this);
 
     request.onerror = function() {
-        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
+        clickPromise.finish(request.status, {name: PAYZEN_NAME, cause: ERROR_TEXT, type: TYPE_DEBIT_CARD});
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));

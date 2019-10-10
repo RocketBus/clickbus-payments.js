@@ -3,6 +3,12 @@
 /**
  * Created by tiagobutzke on 7/2/15.
  */
+
+
+var ERROR_TEXT = 'error';
+var TYPE_CREDIT_CARD = 'credit_card';
+var TYPE_DEBIT_CARD = 'debit_card';
+
 function ClickPromise(callable, clickbusPayments) {
     this.callable = callable;
     this.clickbusPayments = clickbusPayments;
@@ -39,7 +45,7 @@ ClickPromise.prototype.finish = function(status, response) {
                 this.clickbusPayments.successResponse[response.type]['token'] = {};
             }
 
-            if ((response.type == 'credit_card' && !response.oneClickPayment) || response.type == 'debit_card') {
+            if ((response.type == TYPE_CREDIT_CARD && !response.oneClickPayment) || response.type == TYPE_DEBIT_CARD) {
                 this.clickbusPayments.successResponse[response.type]['brand'] = this.clickbusPayments.getCardBrand();
             }
 

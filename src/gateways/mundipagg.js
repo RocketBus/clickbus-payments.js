@@ -1,8 +1,10 @@
 "use strict";
 
+var MUNDIPAGG_NAME = 'mundipagg';
+
 function MundiPagg(publicKey, isTest) {
-    this.type = 'credit_card';
-    this.name = 'mundipagg';
+    this.type = TYPE_CREDIT_CARD;
+    this.name = MUNDIPAGG_NAME;
 
     this.gatewayUrl = "https://api.mundipagg.com/core/v1/tokens?appId="+publicKey;
 }
@@ -27,18 +29,18 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
     request.open('POST', this.gatewayUrl);
     request.setRequestHeader("Content-Type", "application/json");
     request.onload = function() {
-        var response = JSON.parse(request.response);
-
         if (request.status == 200) {
+            var response = JSON.parse(request.response);
+
             clickPromise.finish(request.status, {content: response.id, type: this.type, name: this.name});
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, type: this.type, cause: response.ErrorReport});
+        clickPromise.finish(request.status, {name: this.name, type: this.type, cause: ERROR_TEXT});
     }.bind(this);
 
     request.onerror = function() {
-        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
+        clickPromise.finish(request.status, {name: MUNDIPAGG_NAME, cause: ERROR_TEXT, type: TYPE_CREDIT_CARD});
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));

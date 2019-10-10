@@ -1,8 +1,10 @@
 "use strict";
 
+var PAYZEN_NAME = 'payzen';
+
 function PayZen() {
-    this.type = 'debit_card';
-    this.name = 'payzen';
+    this.type = TYPE_DEBIT_CARD;
+    this.name = PAYZEN_NAME;
 }
 
 PayZen.prototype.start = function() { };
@@ -13,17 +15,17 @@ PayZen.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
     request.open('POST', '/payment/token/debit_card');
     request.onload = function() {
-        var response = JSON.parse(request.response);
         if (request.status == 200) {
+            var response = JSON.parse(request.response);
             clickPromise.finish(request.status, {content: response, type: this.type, name: this.name});
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, cause: response.ErrorReport});
+        clickPromise.finish(request.status, {name: this.name, cause: ERROR_TEXT, type: this.type});
     }.bind(this);
 
     request.onerror = function() {
-        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
+        clickPromise.finish(request.status, {name: PAYZEN_NAME, cause: ERROR_TEXT, type: TYPE_DEBIT_CARD});
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));
