@@ -1,8 +1,10 @@
 "use strict";
 
+var PAYPAL_NAME = 'paypal';
+
 function Paypal(publicKey, isTest) {
-    this.type = 'paypal';
-    this.name = 'paypal';
+    this.type = PAYPAL_NAME;
+    this.name = PAYPAL_NAME;
     this.publicKey = publicKey;
 }
 
@@ -20,11 +22,11 @@ Paypal.prototype.createToken = function(form, clickPromise) {
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, cause: 'error', type: this.type});
+        clickPromise.finish(request.status, {name: this.name, cause: ERROR_TEXT, type: this.type});
     }.bind(this);
 
     request.onerror = function() {
-        clickPromise.finish(request.status, {name: this.name, cause: 'error'});
+        clickPromise.finish(request.status, {name: PAYPAL_NAME, cause: ERROR_TEXT, type: PAYPAL_NAME});
     };
 
     request.send();

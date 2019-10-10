@@ -1,7 +1,7 @@
 "use strict";
 
 function MercadoPago(publicKey, customName) {
-    this.type = 'credit_card';
+    this.type = TYPE_CREDIT_CARD;
     this.name = 'mercadoPago';
     this.customName = customName;
 

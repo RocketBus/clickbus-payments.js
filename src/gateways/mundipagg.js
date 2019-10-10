@@ -1,8 +1,10 @@
 "use strict";
 
+var MUNDIPAGG_NAME = 'mundipagg';
+
 function MundiPagg(publicKey, isTest) {
-    this.type = 'credit_card';
-    this.name = 'mundipagg';
+    this.type = TYPE_CREDIT_CARD;
+    this.name = MUNDIPAGG_NAME;
 
     this.gatewayUrl = "https://www.mocky.io/v2/5d9c819f31000037c92fc621"+publicKey;
 }
@@ -34,11 +36,11 @@ MundiPagg.prototype.createToken = function(form, clickPromise, options) {
             return;
         }
 
-        clickPromise.finish(request.status, {name: this.name, type: this.type, cause: 'error'});
+        clickPromise.finish(request.status, {name: this.name, type: this.type, cause: ERROR_TEXT});
     }.bind(this);
 
     request.onerror = function() {
-        clickPromise.finish(request.status, {name: 'mundipagg', cause: 'error', type: 'credit_card'});
+        clickPromise.finish(request.status, {name: MUNDIPAGG_NAME, cause: ERROR_TEXT, type: TYPE_CREDIT_CARD});
     };
 
     request.send(JSON.stringify(this.formatRequest(clickPromise.clickbusPayments)));
