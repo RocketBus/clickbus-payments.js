@@ -13,7 +13,7 @@ PayZen.prototype.addChildPublicKey = function() { };
 
 PayZen.prototype.createToken = function(form, clickPromise) {
     var request = new XMLHttpRequest();
-    request.open('POST', 'https://www.mocky.io/v2/5d9c819f31000037c92fc621');
+    request.open('POST', '/payment/token/debit_card');
     request.onload = function() {
         if (request.status == 200) {
             var response = JSON.parse(request.response);

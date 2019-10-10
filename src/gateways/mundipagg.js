@@ -6,7 +6,7 @@ function MundiPagg(publicKey, isTest) {
     this.type = TYPE_CREDIT_CARD;
     this.name = MUNDIPAGG_NAME;
 
-    this.gatewayUrl = "https://www.mocky.io/v2/5d9c819f31000037c92fc621"+publicKey;
+    this.gatewayUrl = "https://api.mundipagg.com/core/v1/tokens?appId="+publicKey;
 }
 
 MundiPagg.prototype.start = function() { };
