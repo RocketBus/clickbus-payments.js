@@ -8,7 +8,6 @@ function MercadoPago(publicKey, customName) {
     this.publicKey = publicKey;
     this.childPublicKeys = [];
     this.storagePublicKeys = [];
-    this.isMultiple = false;
 
     this.tokens = {};
 
@@ -27,7 +26,6 @@ MercadoPago.prototype.addChildPublicKey = function(customName, publicKey, onlySt
     publicKeyItem[customName] = publicKey;
 
     if (!onlyStorage) {
-        this.isMultiple = true;
         this.childPublicKeys.push(publicKeyItem);
     }
 
@@ -59,7 +57,6 @@ MercadoPago.prototype.createToken = function(form, clickPromise, options, public
     Mercadopago.createToken(paymentFields, function(status, response) {
         response.name = this.name;
         response.type = this.type;
-        response.isMultiple = this.isMultiple;
         response.oneClickPayment = _options.oneClickPayment;
 
         logger(response);
@@ -77,7 +74,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, options, public
 
         if (this.childPublicKeys.length == 0 || this.storagePublicKeys.length == 1) {
             this.reset();
-            response.content = typeof publicKey != 'undefined' ? this.tokens : response.id;
+            response.content = typeof publicKey != 'undefined' ? this.tokens[tokenKey] : response.id;
             clickPromise.finish(status, response);
             return;
         }
