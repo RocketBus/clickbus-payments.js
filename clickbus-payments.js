@@ -803,6 +803,18 @@ PayZen.prototype.formatRequest = function(clickbusPayments) {
 
 "use strict";
 
+function Pix() {
+    this.type = 'pix';
+    this.name = 'pix';
+}
+
+Pix.prototype.start = function() { };
+Pix.prototype.clearSession = function() { };
+Pix.prototype.addChildPublicKey = function() { };
+Pix.prototype.createToken = function() { };
+
+"use strict";
+
 function Wallet() {
     this.type = 'wallet';
     this.name = 'wallet_mercadopago';
