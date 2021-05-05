@@ -541,10 +541,11 @@ function merge(primary, secundary) {
 
 "use strict";
 
-function MercadoPago(publicKey, customName) {
+function MercadoPago(publicKey, customName, datadogLogs) {
     this.type = TYPE_CREDIT_CARD;
     this.name = 'mercadoPago';
     this.customName = customName;
+    this.datadogLogs = datadogLogs;
 
     this.publicKey = publicKey;
     this.childPublicKeys = [];
@@ -603,6 +604,7 @@ MercadoPago.prototype.createToken = function(form, clickPromise, options, public
         logger(response);
 
         if (status != 201 && status != 200) {
+            console.error('error generating mercadoPago token', response);
             this.reset();
             clickPromise.finish(status, response);
             return;
